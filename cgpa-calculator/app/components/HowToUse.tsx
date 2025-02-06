@@ -9,7 +9,7 @@ export const HowToUse = () => {
           <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-gray-100">
             How to Use UAF Grade Calculator
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
             Calculate your University of Agriculture Faisalabad (UAF) CGPA instantly with our Calculator.
             Designed specifically for UAF students following the university's grading criteria.
           </p>
@@ -41,7 +41,7 @@ export const HowToUse = () => {
             <div key={index} className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow">
               <item.icon className="w-8 h-8 text-blue-600 dark:text-blue-400 mb-4" />
               <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">{item.title}</h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">{item.description}</p>
+              <p className="text-gray-700 dark:text-gray-300 text-sm">{item.description}</p>
             </div>
           ))}
         </div>

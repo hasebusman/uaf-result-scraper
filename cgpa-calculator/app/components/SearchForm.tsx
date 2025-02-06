@@ -63,6 +63,7 @@ export const SearchForm = ({
         <button
           type="submit"
           disabled={loading}
+          aria-label="Search by registration number"
           className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 
                    bg-blue-600 dark:bg-blue-500 text-white rounded-lg text-sm font-medium
                    hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors 
