@@ -153,6 +153,7 @@ export default function ContactPage() {
                     <button
                       type="submit"
                       disabled={isLoading}
+                      aria-label="Send message"
                       className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 
                                  hover:from-blue-600 hover:to-indigo-700
                                  text-white font-medium py-2.5 px-4 rounded-lg
