@@ -21,6 +21,8 @@ export const LoadingSpinner = ({ progress }: LoadingSpinnerProps) => {
 
   return (
     <motion.div
+      role="progressbar"
+      aria-label="Loading progress"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-xl w-full max-w-lg mx-auto mb-8"

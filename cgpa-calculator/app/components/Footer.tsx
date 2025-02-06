@@ -26,7 +26,7 @@ export const Footer = () => {
 					</div>
 
 					{/* Built with love text */}
-					<div className="flex items-center justify-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+					<div className="flex items-center justify-center space-x-2 text-sm text-gray-700 dark:text-gray-300">
 						<span>Built with</span>
 						<Heart className="w-4 h-4 text-red-500 fill-current animate-pulse" />
 						<span>by Haseeb Usman</span>
@@ -38,6 +38,7 @@ export const Footer = () => {
 							href="https://www.linkedin.com/in/haseeb-usman"
 							target="_blank"
 							rel="noopener noreferrer"
+							aria-label="Open LinkedIn profile"
 							className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full 
                      transition-colors hover:text-blue-600 dark:hover:text-blue-400"
 						>
@@ -47,6 +48,7 @@ export const Footer = () => {
 							href="https://github.com/haseebusman0305"
 							target="_blank"
 							rel="noopener noreferrer"
+							aria-label="Open GitHub profile"
 							className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full 
                      transition-colors hover:text-gray-900 dark:hover:text-white"
 						>

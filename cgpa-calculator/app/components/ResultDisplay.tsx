@@ -100,6 +100,7 @@ export const ResultDisplay = ({
         <button
           onClick={downloadPDF}
           disabled={isDownloading}
+          aria-label="Download result as PDF"
           className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed"
         >
           {isDownloading ? (
@@ -151,7 +152,6 @@ export const ResultDisplay = ({
             />
           </>
         ))}
-        <AdBannerInline />
       </div>
     </motion.div>
   )
