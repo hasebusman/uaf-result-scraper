@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import { BookOpen, Download, Loader2 } from 'lucide-react'
 import { SemesterCard } from './SemesterCard'
 import { CourseRow, ResultData } from '../types'
-import { groupBySemester, calculateSemesterCGPA, calculateOverallCGPA } from '../utils/calculations'
+import { groupBySemester, calculateSemesterCGPA, calculateOverallCGPA, cgpaToPercentage } from '../utils/calculations'
 import { DownloadableResult } from './DownloadableResult';
 import { useEffect, useState } from 'react'
 import { AdBannerInline } from './AdBannerInline'
@@ -94,25 +94,27 @@ export const ResultDisplay = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      className="space-y-6"
+      className="space-y-6 min-h-[300px]"
     >
-      <div className="flex justify-end mb-6">
+      <div className="flex justify-end mb-6 h-[40px]"> 
         <button
           onClick={downloadPDF}
           disabled={isDownloading}
           aria-label="Download result as PDF"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 px-4 h-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed"
         >
           {isDownloading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
             <Download className="w-4 h-4" />
           )}
-          {isDownloading ? 'Downloading...' : 'Download'}
+          <span className="inline-block min-w-[80px]"> 
+            {isDownloading ? 'Downloading...' : 'Download'}
+          </span>
         </button>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700" id="result-card">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 min-h-[150px]" id="result-card">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-full">
@@ -132,11 +134,14 @@ export const ResultDisplay = ({
             <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
               {overallCGPA.toFixed(4)}
             </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {cgpaToPercentage(overallCGPA)}%
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[200px]">
         {Object.entries(groupBySemester(includedCourses)).map(([semester, courses], index) => (
           <>
             <SemesterCard
