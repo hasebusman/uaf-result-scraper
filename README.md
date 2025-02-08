@@ -27,7 +27,8 @@ A modern web application designed for University of Agriculture Faisalabad stude
   - Dark/Light mode support
 
 - 🛡️ **Reliable Backend**
-  - Secure data handling
+  - Server-side rendering with Next.js API routes
+  - Secure web scraping implementation
   - Registration number validation
   - Error handling and user feedback
   - High-performance API endpoints
@@ -39,12 +40,7 @@ A modern web application designed for University of Agriculture Faisalabad stude
 npm install
 ```
 
-2. Set up environment:
-```
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
-```
-
-3. Run the application:
+2. Run the application:
 ```bash
 npm run dev
 ```
@@ -59,9 +55,9 @@ npm run dev
 
 ## Tech Stack
 
-- **Frontend**: React, TailwindCSS, TypeScript
-- **Backend**: Flask, BeautifulSoup4, Python
-- **Deployment**: Vercel (Frontend), Railway (Backend)
+- **Frontend**: Next.js, React, TailwindCSS, TypeScript
+- **Backend**: Next.js API Routes
+- **Deployment**: Vercel
 
 ## License
 
