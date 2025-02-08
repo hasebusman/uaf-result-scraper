@@ -12,7 +12,6 @@ import { toast } from 'react-hot-toast'
 import { AnimatePresence } from 'framer-motion'
 import { calculateSemesterCGPA, groupBySemester, resetOverallCGPA } from './utils/calculations'
 import { LoadingSpinner } from './components/LoadingSpinner'
-import { AdBanner } from './components/AdBanner'
 
 export default function Home() {
   const [regNumber, setRegNumber] = useState('')
@@ -32,7 +31,6 @@ export default function Home() {
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
-// Home component
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault()
 
@@ -129,11 +127,6 @@ const handleSubmit = async (e: React.FormEvent) => {
     description: 'Calculate your CGPA for University of Agriculture Faisalabad (UAF) with our easy-to-use calculator.',
     applicationCategory: 'EducationalApplication',
     operatingSystem: 'Any',
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'USD',
-    },
     author: {
       '@type': 'Organization',
       name: 'UAF CGPA Calculator',
@@ -148,36 +141,39 @@ const handleSubmit = async (e: React.FormEvent) => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8 text-gray-700 dark:text-gray-300">
         <Header />
-        <SearchForm
-          regNumber={regNumber}
-          loading={loading}
-          onSubmit={handleSubmit}
-          onRegNumberChange={setRegNumber}
-          error={error}
-          onRetry={() => {
-            setError('')
-            handleSubmit(new Event('submit') as any)
-          }}
-        />
+        <div className="min-h-[100px]"> 
+          <SearchForm
+            regNumber={regNumber}
+            loading={loading}
+            onSubmit={handleSubmit}
+            onRegNumberChange={setRegNumber}
+            error={error}
+            onRetry={() => {
+              setError('')
+              handleSubmit(new Event('submit') as any)
+            }}
+          />
+        </div>
         
         <AnimatePresence mode="wait">
-          {loading ? (
-            <LoadingSpinner progress={progress} />
-          ) : (
-            result && (
-              <ResultDisplay
-                result={result}
-                includedCourses={includedCourses}
-                expandedSemesters={expandedSemesters}
-                windowWidth={windowWidth}
-                onRemoveCourse={handleRemoveCourse}
-                onAddCourse={handleAddCourse}
-                toggleSemesterExpansion={toggleSemesterExpansion}
-              />
-            )
-          )}
+          <div className=""> 
+            {loading ? (
+              <LoadingSpinner progress={progress} />
+            ) : (
+              result && (
+                <ResultDisplay
+                  result={result}
+                  includedCourses={includedCourses}
+                  expandedSemesters={expandedSemesters}
+                  windowWidth={windowWidth}
+                  onRemoveCourse={handleRemoveCourse}
+                  onAddCourse={handleAddCourse}
+                  toggleSemesterExpansion={toggleSemesterExpansion}
+                />
+              )
+            )}
+          </div>
         </AnimatePresence>
-        
         <HowToUse />
         <CalculationSystem />
         <Footer />

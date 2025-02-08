@@ -3,7 +3,7 @@ import { BookOpen, Trash2, ChevronDown, ChevronUp, Info, Plus } from 'lucide-rea
 import { motion, AnimatePresence } from 'framer-motion'
 import { getGradeColor } from '../utils/gradeUtils'
 import { CourseRow } from '../types'
-import { calculateGradePoints } from '../utils/calculations'
+import { calculateGradePoints, cgpaToPercentage } from '../utils/calculations'
 import { CourseDetailModal } from './CourseDetailModal'
 import { AddCourseModal } from './AddCourseModal'
 
@@ -103,9 +103,15 @@ export const SemesterCard = ({
               >
                 <Plus className="w-5 h-5 text-green-600 dark:text-green-400" />
               </button>
-              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                GPA: {semesterCGPA.toFixed(4)}
-              </span>
+              <div className="text-right">
+                <p className="text-sm text-gray-600 dark:text-gray-400">GPA:</p>
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {semesterCGPA.toFixed(4)}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {cgpaToPercentage(semesterCGPA)}%
+                </p>
+              </div>
               {isMobile && (
                 isExpanded ? (
                   <ChevronUp className="w-5 h-5 text-gray-500 dark:text-gray-400" />
