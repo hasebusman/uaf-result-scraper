@@ -44,6 +44,23 @@
   .nav-link {
     @apply relative px-3 py-2 transition-colors hover:text-foreground before:absolute before:left-0 before:-bottom-1 before:h-0.5 before:w-0 before:bg-foreground before:transition-all before:duration-300 hover:before:w-full;
   }
+
+  .letter-spacing-wide {
+    letter-spacing: var(--input-letter-spacing, 0.5em);
+  }
+
+  input.letter-spacing-wide::placeholder {
+    letter-spacing: var(--input-letter-spacing, 0.5em);
+  }
+
+  .reg-number-input {
+    @apply bg-transparent border-0 focus:outline-none text-lg font-medium;
+  }
+
+  .reg-number-segment {
+    @apply px-2 py-2 bg-gray-100 dark:bg-gray-700/50 rounded-lg text-gray-400 
+           dark:text-gray-500 font-medium select-none transition-colors;
+  }
 }
 
 @keyframes float {
@@ -89,6 +106,12 @@
   }
 }
 
+@keyframes focusHighlight {
+  0% { background-color: rgba(59, 130, 246, 0); }
+  50% { background-color: rgba(59, 130, 246, 0.1); }
+  100% { background-color: rgba(59, 130, 246, 0); }
+}
+
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
@@ -107,6 +130,10 @@
 
 .animate-fadeInUp {
   animation: fadeInUp 0.5s ease-out;
+}
+
+.focus-highlight {
+  animation: focusHighlight 1s ease-in-out;
 }
 
 .animation-delay-200 {
