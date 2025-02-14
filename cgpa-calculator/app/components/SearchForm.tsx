@@ -2,7 +2,6 @@ import { Search, AlertCircle, RefreshCw, BugPlay } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 import { useState, useRef, useEffect } from 'react'
-import InputMask from 'react-input-mask'
 
 interface SearchFormProps {
   regNumber: string;
