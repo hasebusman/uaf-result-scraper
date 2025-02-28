@@ -102,6 +102,7 @@ export const SearchForm = ({
             <input
               ref={yearRef}
               type="text"
+              inputMode="numeric" 
               value={year}
               onChange={handleYearChange}
               onKeyDown={handleYearKeyDown}
@@ -115,6 +116,7 @@ export const SearchForm = ({
             <input
               ref={numberRef}
               type="text"
+              inputMode="numeric"
               value={number}
               onChange={handleNumberChange}
               onKeyDown={handleNumberKeyDown}
