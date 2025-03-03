@@ -11,5 +11,4 @@ module.exports = {
       }
     ],
   },
-  exclude: ['/server-sitemap.xml'],
 }
