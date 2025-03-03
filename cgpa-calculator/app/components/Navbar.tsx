@@ -18,7 +18,7 @@ export function Navbar() {
   ]
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm shadow-sm">
+    <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 backdrop-blur-sm shadow-sm">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" aria-label="Go to homepage" className="group flex items-center space-x-2">
@@ -92,7 +92,7 @@ export function Navbar() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="md:hidden absolute top-16 inset-x-0 bg-white dark:bg-gray-900 shadow-lg"
+            className="md:hidden absolute top-16 inset-x-0 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 shadow-lg"
           >
             <nav className="container mx-auto px-4 py-4 flex flex-col space-y-2">
               {navLinks.map((link) => (

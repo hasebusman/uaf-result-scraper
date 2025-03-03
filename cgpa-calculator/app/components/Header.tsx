@@ -12,7 +12,7 @@ export default function Header() {
           <GraduationCap className="w-20 h-20 mx-auto text-blue-600 dark:text-blue-400 mb-6" />
         </div>
       </div>
-      <h1 className="text-5xl font-bold text-gray-900 dark:text-gray-100 tracking-tight animate-fadeInUp">
+      <h1 className="text-5xl font-bold tracking-tight animate-fadeInUp bg-gradient-text">
         UAF CGPA Calculator
       </h1>
       <p className="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto animate-fadeInUp animation-delay-200">
