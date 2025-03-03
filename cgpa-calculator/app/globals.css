@@ -139,3 +139,28 @@
 .animation-delay-200 {
   animation-delay: 200ms;
 }
+
+.bg-gradient-text {
+  background-image: linear-gradient(
+    to right, 
+    #3b82f6, 
+    #8b5cf6, 
+    #ec4899, 
+    #8b5cf6, 
+    #3b82f6
+  );
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: gradientMove 5s linear infinite;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
