@@ -12,13 +12,13 @@ interface SearchFormProps {
   onRetry?: () => void;
 }
 
-export const SearchForm = ({ 
-  regNumber, 
-  loading, 
-  onSubmit, 
+export const SearchForm = ({
+  regNumber,
+  loading,
+  onSubmit,
   onRegNumberChange,
   error,
-  onRetry 
+  onRetry
 }: SearchFormProps) => {
   const yearRef = useRef<HTMLInputElement>(null)
   const numberRef = useRef<HTMLInputElement>(null)
@@ -44,7 +44,7 @@ export const SearchForm = ({
     if (e.key === 'Backspace' && !number) {
       e.preventDefault()
       yearRef.current?.focus()
-    
+
       if (yearRef.current) {
         const length = year.length
         setTimeout(() => {
@@ -90,7 +90,7 @@ export const SearchForm = ({
   return (
     <motion.form
       onSubmit={handleSubmit}
-      className="w-full max-w-lg mx-auto mb-8"
+      className="w-full max-w-lg mx-auto mb-8 z-50 "
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -102,7 +102,7 @@ export const SearchForm = ({
             <input
               ref={yearRef}
               type="text"
-              inputMode="numeric" 
+              inputMode="numeric"
               value={year}
               onChange={handleYearChange}
               onKeyDown={handleYearKeyDown}
@@ -130,7 +130,7 @@ export const SearchForm = ({
             disabled={loading}
             className="flex-shrink-0 px-3 py-1.5 bg-blue-600 dark:bg-blue-500 text-white rounded-md text-sm font-medium
                      hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors 
-                     disabled:bg-blue-300 dark:disabled:bg-blue-700 shadow-sm"
+                     disabled:bg-blue-300 dark:disabled:bg-blue-700 shadow-sm z-[9999999]"
           >
             {loading ? 'Searching...' : 'Search'}
           </button>
