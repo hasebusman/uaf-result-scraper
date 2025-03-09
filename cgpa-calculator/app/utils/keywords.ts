@@ -1,6 +1,5 @@
 export const keywords = [
 	"UAF CGPA System",
-	"GPA Calculator",
 	"CGPA Calculator UAF",
 	"gpa calculator uaf",
 	"uaf cgpa calculator",
@@ -8,4 +7,5 @@ export const keywords = [
 	"uaf cgpa calculator live",
 	"uaf calculator live",
 	"uaf calculator",
+	"lms uaf cgpa calculator"
 ]
