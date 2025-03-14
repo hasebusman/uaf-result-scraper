@@ -13,10 +13,10 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: {
-    default: "UAF CGPA Calculator | Calculate Your University GPA Easily",
+    default: "UAF CGPA Calculator | Calculate Your UAF GPA/CGPA Easily",
     template: "%s | UAF CGPA Calculator"
   },
-  description: "CGPA Calculator for University of Agriculture Faisalabad (UAF) students. Calculate UAF semester GPA and CGPA instantly. Trusted by UAF students across all departments and programs.",
+  description: "CGPA/GPA Calculator for UAF students. Calculate and Download Result Instantly. Trusted by UAF students across all departments and programs.",
   keywords: keywords,
   icons: {
     icon: '/icon.png'

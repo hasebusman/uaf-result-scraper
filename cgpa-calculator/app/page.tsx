@@ -1,37 +1,24 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Header from './components/Header'
 import { SearchForm } from './components/SearchForm'
-import { ResultDisplay } from './components/ResultDisplay'
 import { HowToUse } from './components/HowToUse'
 import { CalculationSystem } from './components/CalculationSystem'
 import { Footer } from './components/Footer'
-import { ResultData, CourseRow } from './types'
 import { toast } from 'react-hot-toast'
-import { AnimatePresence } from 'framer-motion'
-import { calculateSemesterCGPA, groupBySemester, resetOverallCGPA } from './utils/calculations'
 import { LoadingSpinner } from './components/LoadingSpinner'
 
 export default function Home() {
+  const router = useRouter()
   const [regNumber, setRegNumber] = useState('')
-  const [result, setResult] = useState<ResultData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [progress, setProgress] = useState(0)
-  const [includedCourses, setIncludedCourses] = useState<CourseRow[]>([])
-  const [expandedSemesters, setExpandedSemesters] = useState<string[]>([])
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0)
   const [scrollPosition, setScrollPosition] = useState(0)
+  const [redirecting, setRedirecting] = useState(false)
+  const [loadingMessage, setLoadingMessage] = useState('')
 
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth)
-    }
-
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,86 +33,23 @@ export default function Home() {
 
     const regNumberPattern = /^\d{4}-ag-\d{1,6}$/i;
     if (!regNumberPattern.test(regNumber)) {
-      toast.error('Please enter a valid registration number (e.g., 2022-ag-7693)');
+      toast.error('Please enter a valid Ag number (e.g., 2022-ag-7693)');
       return;
     }
 
     setLoading(true)
     setError('')
-    setProgress(0)
-
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => (prev >= 90 ? 90 : prev + 10))
-    }, 300)
-
+    setLoadingMessage("Searching for academic records...")
     try {
-      
-      const response = await fetch(`/api/result?reg_number=${regNumber}`)
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const responseData = await response.json()
-
-      if (responseData.status === 'success') {
-        setResult(responseData.data);
-        setIncludedCourses(responseData.data.result_table.rows);
-        setExpandedSemesters([]);
-        toast.success('Results loaded successfully!');
-      } else {
-        setError(responseData.message || 'No results found for this registration number. Please check the number and try again.')
-        toast.error(responseData.message || 'No results found')
-      }
+      router.push(`/results/${regNumber.toLowerCase()}`)
+  
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unable to fetch results. Please try again later.'
+      const errorMessage = err instanceof Error ? err.message : 'Unable to process request. Please try again later.'
       setError(errorMessage)
       toast.error(errorMessage)
-    } finally {
-      clearInterval(progressInterval)
-      setProgress(100)
-      setTimeout(() => setLoading(false), 500)
-    }
-  }
-
-  useEffect(() => {
-    if (result) {
-      resetOverallCGPA()
-      setIncludedCourses(result.result_table.rows)
-    }
-  }, [result])
-
-  const handleRemoveCourse = (courseCode: string) => {
-    setIncludedCourses(prevCourses => {
-      const newCourses = prevCourses.filter(course => course.course_code !== courseCode);
-      resetOverallCGPA();
-      const groupedSemesters = groupBySemester(newCourses);
-      Object.values(groupedSemesters).forEach(semesterCourses => {
-        calculateSemesterCGPA(semesterCourses);
-      });
-      return newCourses;
-    });
-  }
-
-  const handleAddCourse = (newCourse: CourseRow) => {
-    setIncludedCourses(prevCourses => {
-      const newCourses = [...prevCourses, newCourse];
-      resetOverallCGPA();
-      const groupedSemesters = groupBySemester(newCourses);
-      Object.values(groupedSemesters).forEach(semesterCourses => {
-        calculateSemesterCGPA(semesterCourses);
-      });
-      return newCourses;
-    });
-  };
-
-  const toggleSemesterExpansion = (semester: string) => {
-    if (windowWidth < 1024) {
-      setExpandedSemesters(prev =>
-        prev.includes(semester)
-          ? prev.filter(s => s !== semester)
-          : [...prev, semester]
-      )
+      setLoading(false)
+      setRedirecting(false)
+      setLoadingMessage('')
     }
   }
 
@@ -136,7 +60,7 @@ export default function Home() {
         <div className="min-h-[100px]"> 
           <SearchForm
             regNumber={regNumber}
-            loading={loading}
+            loading={loading || redirecting}
             onSubmit={handleSubmit}
             onRegNumberChange={setRegNumber}
             error={error}
@@ -147,27 +71,20 @@ export default function Home() {
           />
         </div>
         
-        <AnimatePresence mode="wait">
-          <div className=""> 
-            {loading ? (
-              <LoadingSpinner progress={progress} />
-            ) : (
-              result && (
-                <ResultDisplay
-                  result={result}
-                  includedCourses={includedCourses}
-                  expandedSemesters={expandedSemesters}
-                  windowWidth={windowWidth}
-                  onRemoveCourse={handleRemoveCourse}
-                  onAddCourse={handleAddCourse}
-                  toggleSemesterExpansion={toggleSemesterExpansion}
-                />
-              )
-            )}
-          </div>
-        </AnimatePresence>
-        <HowToUse />
-        <CalculationSystem />
+        {(loading || redirecting) && (
+          <LoadingSpinner 
+            message={loadingMessage}
+            isRedirecting={redirecting}
+          />
+        )}
+        
+        {!loading && !redirecting && (
+          <>
+            <HowToUse />
+            <CalculationSystem />
+          </>
+        )}
+        
         <Footer />
       </div>
       

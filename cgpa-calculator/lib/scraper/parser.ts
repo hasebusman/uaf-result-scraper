@@ -6,7 +6,6 @@ export class ResultParser {
     const startTime = Date.now();
     const $ = cheerio.load(html);
 
-    // Get student info with proper field names
     const studentInfo: ResultData['student_info'] = {
       student_full_name: '',
       registration_: '',
@@ -25,13 +24,11 @@ export class ResultParser {
       }
     });
 
-    // Get result table headers
     const headers = [
       'sr', 'semester', 'teacher_name', 'course_code', 'course_title',
       'credit_hours', 'mid', 'assignment', 'final', 'practical', 'total', 'grade'
     ];
 
-    // Get result rows
     const rows: CourseRow[] = [];
     $('table.table.tab-content').last().find('tr:gt(0)').each((_, row) => {
       const rowData = headers.reduce((acc, key) => ({

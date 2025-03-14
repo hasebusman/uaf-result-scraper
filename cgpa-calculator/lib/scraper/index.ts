@@ -6,7 +6,6 @@ import type { CourseRow, ResultData } from '../../app/types';
 export class UAFScraper {
   private async submitFormAndGetResult(regNumber: string): Promise<string> {
     try {
-      // Step 1: First fetch the login page to get the token
       const loginPageResponse = await axios.get(CONFIG.LOGIN_URL, {
         headers: {
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -14,19 +13,15 @@ export class UAFScraper {
         }
       });
 
-      // Step 2: Create a new session with cookies
       const cookies = loginPageResponse.headers['set-cookie'];
       const cookieHeader = cookies ? cookies.map(c => c.split(';')[0]).join('; ') : '';
 
-      // Extract token with improved regex
       const tokenMatch = loginPageResponse.data.match(/document\.getElementById\(['"]token['"]\)\.value\s*=\s*['"]([^'"]+)['"]/);
       const token = tokenMatch ? tokenMatch[1] : '';
       
       if (!token) {
         throw new Error('Failed to extract authentication token');
       }
-
-      // Step 3: Submit form with proper headers and cookies
       const formData = new URLSearchParams();
       formData.append('Register', regNumber);
       formData.append('token', token);
@@ -52,12 +47,9 @@ export class UAFScraper {
 
       const html = resultResponse.data;
 
-      // Basic HTML validation
       if (typeof html !== 'string' || html.length < 100) {
         throw new Error('Invalid HTML response received');
       }
-
-      // Check for essential elements
       if (!html.includes('table class="table tab-content"')) {
         throw new Error('Response missing result table');
       }
@@ -80,19 +72,12 @@ export class UAFScraper {
 
     while (retries < CONFIG.MAX_RETRIES) {
       try {
-        // Get the result page HTML
         const html = await this.submitFormAndGetResult(regNumber);
-        
-        // Parse the HTML and return structured data
         const $ = cheerio.load(html);
-
-        // Extract student info from first table
         const studentInfo = this.extractStudentInfo($);
         if (!studentInfo.registration_) {
           throw new Error('Could not find student information');
         }
-
-        // Extract result data from second table
         const resultData = this.extractResultData($);
         if (resultData.results.length === 0) {
           throw new Error('No result data found');
@@ -161,19 +146,15 @@ export class UAFScraper {
     const results: CourseRow[] = [];
 
     const resultTable = $('table.table.tab-content').last();
-    
-    // Extract headers
-    resultTable.find('tr:first-child th').each((_, th) => {
+        resultTable.find('tr:first-child th').each((_, th) => {
       headers.push($(th).text().trim().toLowerCase().replace(/\s+/g, '_'));
     });
 
-    // Validate required headers
     const requiredFields: (keyof CourseRow)[] = [
       'sr', 'semester', 'teacher_name', 'course_code', 'course_title',
       'credit_hours', 'mid', 'assignment', 'final', 'practical', 'total', 'grade'
     ];
 
-    // Extract rows
     resultTable.find('tr:gt(0)').each((_, row) => {
       const rowData = requiredFields.reduce((acc, field) => ({
         ...acc,

@@ -4,8 +4,8 @@ export const CONFIG = {
   LOGIN_URL: "http://lms.uaf.edu.pk/login/index.php",
   RESULT_URL: "http://lms.uaf.edu.pk/course/uaf_student_result.php",
   FORM_FIELDS: {
-    Register: '',  // Will be set to reg number
-    submit: 'Result'  // This matches the submit button value
+    Register: '', 
+    submit: 'Result' 
   },
   AXIOS_TIMEOUT: 30000,
   VALIDATION: {
