@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Header from './components/Header'
 import { SearchForm } from './components/SearchForm'
@@ -9,6 +9,7 @@ import { CalculationSystem } from './components/CalculationSystem'
 import { Footer } from './components/Footer'
 import { toast } from 'react-hot-toast'
 import { LoadingSpinner } from './components/LoadingSpinner'
+import { debounce } from './utils/debounce'
 
 export default function Home() {
   const router = useRouter()
@@ -19,14 +20,22 @@ export default function Home() {
   const [redirecting, setRedirecting] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState('')
 
+  const handleScroll = useCallback(
+    debounce(() => {
+      setScrollPosition(window.scrollY)
+    }, 15), 
+    []
+  );
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollPosition(window.scrollY)
-    }
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    window.addEventListener('resize', handleScroll)
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleScroll)
+    }
+  }, [handleScroll])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

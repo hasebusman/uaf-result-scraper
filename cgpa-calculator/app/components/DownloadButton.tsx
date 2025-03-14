@@ -239,7 +239,7 @@ const ResultPDF = ({ result, includedCourses }: ResultPDFProps) => {
         <View style={styles.header}>
           <View style={styles.headerContent}>
             <Text style={styles.title}>University of Agriculture, Faisalabad</Text>
-            <Text style={styles.subtitle}>UnOfficial Academic Transcript</Text>
+            <Text style={styles.subtitle}>Unofficial Academic Transcript</Text>
           </View>
           <View>
             <Text style={styles.subtitle}>Generated on: {formattedDate}</Text>
