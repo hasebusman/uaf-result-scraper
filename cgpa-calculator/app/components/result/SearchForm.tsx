@@ -1,5 +1,4 @@
 import { Search, AlertCircle, RefreshCw, BugPlay } from 'lucide-react'
-import { motion } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
 import { useResultStore } from '../../store/useResultStore'
 
@@ -69,12 +68,9 @@ export const SearchForm = ({ windowWidth = 0 }: SearchFormProps) => {
   }, [])
 
   return (
-    <motion.form
+    <form
       onSubmit={handleSubmit}
-      className="w-full max-w-lg mx-auto mb-8 z-50 "
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      className="w-full max-w-lg mx-auto mb-8 z-50"
     >
       <div className="relative w-full">
         <div className="flex items-center gap-1.5 p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm focus-within:ring-2 focus-within:ring-blue-500/50 transition-all shadow-md w-full">
@@ -118,9 +114,7 @@ export const SearchForm = ({ windowWidth = 0 }: SearchFormProps) => {
         </div>
       </div>
       {error && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div
           className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
         >
           <div className="flex items-start">
@@ -150,9 +144,9 @@ export const SearchForm = ({ windowWidth = 0 }: SearchFormProps) => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       )}
-    </motion.form>
+    </form>
   )
 }
 

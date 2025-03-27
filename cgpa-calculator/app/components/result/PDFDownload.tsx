@@ -1,7 +1,8 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import { ResultData, CourseRow } from '../../types';
-import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
+import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Font, DocumentProps } from '@react-pdf/renderer';
 import { Loader2, Download } from 'lucide-react';
 import { calculateOverallCGPA, calculateSemesterCGPA, groupBySemester, cgpaToPercentage } from '../../utils/calculations';
 
@@ -319,28 +320,96 @@ interface DownloadButtonProps {
   includedCourses: CourseRow[];
 }
 
-export function DownloadButton({ result, includedCourses }: DownloadButtonProps) {
+const PDFDownloadButton = ({ document, fileName }: { 
+  document: React.ReactElement<DocumentProps, string | React.JSXElementConstructor<any>>, 
+  fileName: string 
+}) => {
+  const [isError, setIsError] = useState(false);
+
+  if (isError) {
+    return (
+      <button
+        disabled
+        aria-label="Download failed"
+        className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 h-10 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm sm:text-base"
+      >
+        <span className="inline-block min-w-[auto] sm:min-w-[80px]">
+          Error
+        </span>
+      </button>
+    );
+  }
+
   return (
     <PDFDownloadLink
-      document={<ResultPDF result={result} includedCourses={includedCourses} />}
-      fileName={`${result.student_info.registration_}.pdf`}
+      document={document}
+      fileName={fileName}
+      onError={(error) => {
+        console.error("PDF generation error:", error);
+        setIsError(true);
+      }}
     >
-      {({ loading }) => (
-        <button
-          disabled={loading}
-          aria-label="Download result as PDF"
-          className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 h-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed text-sm sm:text-base"
-        >
-          {loading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Download className="w-4 h-4" />
-          )}
-          <span className="inline-block min-w-[auto] sm:min-w-[80px]">
-            {loading ? 'Preparing...' : 'Download'}
-          </span>
-        </button>
-      )}
+      {({ loading, error }) => {
+        if (error) {
+          return (
+            <button
+              disabled
+              aria-label="Download failed"
+              className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 h-10 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm sm:text-base"
+            >
+              <span className="inline-block min-w-[auto] sm:min-w-[80px]">
+                Error
+              </span>
+            </button>
+          );
+        }
+        return (
+          <button
+            disabled={loading}
+            aria-label="Download result as PDF"
+            className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 h-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed text-sm sm:text-base"
+          >
+            {loading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Download className="w-4 h-4" />
+            )}
+            <span className="inline-block min-w-[auto] sm:min-w-[80px]">
+              {loading ? 'Preparing...' : 'Download'}
+            </span>
+          </button>
+        );
+      }}
     </PDFDownloadLink>
+  );
+};
+
+export function DownloadButton({ result, includedCourses }: DownloadButtonProps) {
+  const [isPdfReady, setIsPdfReady] = useState(false);
+  
+  const pdfDocument = useMemo(() => {
+    if (!isPdfReady) return null;
+    return <ResultPDF result={result} includedCourses={includedCourses} />;
+  }, [result, includedCourses, isPdfReady]);
+  
+  const fileName = `${result.student_info.registration_}.pdf`;
+
+  if (!isPdfReady) {
+    return (
+      <button
+        onClick={() => setIsPdfReady(true)}
+        aria-label="Prepare PDF"
+        className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 h-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+      >
+        <Download className="w-4 h-4" />
+        <span className="inline-block min-w-[auto] sm:min-w-[80px]">
+          Download
+        </span>
+      </button>
+    );
+  }
+
+  return (
+    <PDFDownloadButton document={pdfDocument!} fileName={fileName} />
   );
 }
