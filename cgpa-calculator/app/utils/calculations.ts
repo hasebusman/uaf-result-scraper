@@ -13,35 +13,15 @@ export const calculateGradePoints = (course: CourseRow) => {
   let marksForMaxGP = 0
   let marksForMinGP = 0
 
-
-  if (creditHours === 5) {
-    maxGradePoints = 20
-    minGradePoints = 5
-    marksForMaxGP = 80
-    marksForMinGP = 40
-  } else if (creditHours === 4) {
-    maxGradePoints = 16
-    minGradePoints = 4
-    marksForMaxGP = 60
-    marksForMinGP = 32
-  } else if (creditHours === 3) {
-    maxGradePoints = 12
-    minGradePoints = 3
-    marksForMaxGP = 48
-    marksForMinGP = 24
-  } else if (creditHours === 2) {
-    maxGradePoints = 8
-    minGradePoints = 2
-    marksForMaxGP = 32
-    marksForMinGP = 16
-  } else if (creditHours === 1) {
-    maxGradePoints = 4
-    minGradePoints = 1
-    marksForMaxGP = 16
-    marksForMinGP = 8
+  if (creditHours >= 1 && creditHours <= 5) {
+    maxGradePoints = creditHours * 4
+    minGradePoints = creditHours
+    marksForMaxGP = creditHours * 16
+    marksForMinGP = creditHours * 8
   } else {
     return 0
   }
+
   if (totalMarks >= marksForMaxGP) {
     return maxGradePoints
   } else if (totalMarks >= marksForMinGP) {

@@ -1,39 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { CourseRow } from '../types';
+import { CourseRow } from '../../types';
 import { X, Loader2, Plus, CheckCircle, Circle, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useResultStore } from '../../store/useResultStore';
 
-interface AttendanceModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  regNumber: string;
-  onAddCourses: (courses: CourseRow[]) => void;
-  existingSemesters: string[];
-  existingCourseCodes: string[]; // Added this prop to get existing course codes from parent
-}
-
-export const AttendanceModal = ({ 
-  isOpen, 
-  onClose, 
-  regNumber, 
-  onAddCourses,
-  existingSemesters,
-  existingCourseCodes // Use the existing codes passed from parent
-}: AttendanceModalProps) => {
+export const AttendanceModal = () => {
+  const { 
+    result, 
+    includedCourses, 
+    addCourses,
+    attendanceModalOpen,
+    closeAttendanceModal
+  } = useResultStore();
+  
   const [attendanceData, setAttendanceData] = useState<CourseRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedCourses, setSelectedCourses] = useState<Record<string, boolean>>({});
   const [creditHours, setCreditHours] = useState<Record<string, string>>({});
   const [showAllCourses, setShowAllCourses] = useState(false);
+  
+  const regNumber = result?.student_info.registration_ || '';
+  const existingSemesters = [...new Set(includedCourses.map(course => course.semester))];
+  const existingCourseCodes = includedCourses.map(course => course.course_code);
 
   useEffect(() => {
-    if (isOpen && regNumber) {
+    if (attendanceModalOpen && regNumber) {
       fetchAttendanceData();
     }
-  }, [isOpen, regNumber]);
+  }, [attendanceModalOpen, regNumber]);
 
   const fetchAttendanceData = async () => {
+    if (!regNumber) return;
+    
     setLoading(true);
     setError('');
     
@@ -44,13 +43,12 @@ export const AttendanceModal = ({
       if (data.status === 'success') {
         setAttendanceData(data.data);
         
-        // Initialize selected courses and credit hours
         const initialSelected: Record<string, boolean> = {};
         const initialCreditHours: Record<string, string> = {};
         
         data.data.forEach((course: CourseRow) => {
           initialSelected[course.course_code] = true;
-          initialCreditHours[course.course_code] = course.credit_hours || "3"; // Default to 3 credit hours
+          initialCreditHours[course.course_code] = course.credit_hours || "3";
         });
         
         setSelectedCourses(initialSelected);
@@ -138,11 +136,10 @@ export const AttendanceModal = ({
         credit_hours: creditHours[course.course_code] || "3"
       }));
     
-    onAddCourses(coursesToAdd);
-    onClose();
+    addCourses(coursesToAdd);
+    closeAttendanceModal();
   };
 
-  // Filter courses to show only new ones if showAllCourses is false
   const displayedCourses = showAllCourses 
     ? attendanceData 
     : attendanceData.filter(course => !existingCourseCodes.includes(course.course_code));
@@ -150,7 +147,7 @@ export const AttendanceModal = ({
   const newCoursesCount = attendanceData.filter(course => 
     !existingCourseCodes.includes(course.course_code)).length;
 
-  if (!isOpen) return null;
+  if (!attendanceModalOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4">
@@ -163,7 +160,7 @@ export const AttendanceModal = ({
         <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
           <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Attendance System Data</h2>
           <button 
-            onClick={onClose}
+            onClick={closeAttendanceModal}
             className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
             <X className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -265,7 +262,7 @@ export const AttendanceModal = ({
         
         <div className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
           <button
-            onClick={onClose}
+            onClick={closeAttendanceModal}
             className="px-3 sm:px-4 py-1.5 sm:py-2 mr-2 text-xs sm:text-sm text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 dark:text-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
           >
             Cancel

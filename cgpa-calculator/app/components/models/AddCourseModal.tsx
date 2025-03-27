@@ -24,7 +24,7 @@ const formatCreditHours = (hours: string): string => {
   const num = parseInt(hours);
   if (num === 1) return '1(1-0)';
   if (num === 2) return '2(2-0)';
-  return `${num}(${num-1}-1)`; // For 3 and above, always use (n-1)-1 format
+  return `${num}(${num-1}-1)`; 
 }
 
 export const AddCourseModal = ({ isOpen, onClose, semester, onAddCourse }: AddCourseModalProps) => {

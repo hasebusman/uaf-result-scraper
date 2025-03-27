@@ -15,7 +15,6 @@ export class UAFScraper {
 
       const cookies = loginPageResponse.headers['set-cookie'];
       const cookieHeader = cookies ? cookies.map(c => c.split(';')[0]).join('; ') : '';
-      console.log(cookies,"cookies");
 
       const tokenMatch = loginPageResponse.data.match(/document\.getElementById\(['"]token['"]\)\.value\s*=\s*['"]([^'"]+)['"]/);
       const token = tokenMatch ? tokenMatch[1] : '';
@@ -228,7 +227,6 @@ export class UAFScraper {
         });
         
         const sessionCookies = sessionResponse.headers['set-cookie'];
-        console.log(sessionCookies, "sessionCookies");
         if (!sessionCookies || sessionCookies.length === 0) {
           throw new Error('No session cookie found in response');
         }

@@ -1,5 +1,5 @@
-import { ResultData, CourseRow } from '../types';
-import { groupBySemester, calculateSemesterCGPA, calculateOverallCGPA } from '../utils/calculations';
+import { ResultData, CourseRow } from '../../types';
+import { groupBySemester, calculateSemesterCGPA, calculateOverallCGPA } from '../../utils/calculations';
 
 interface DownloadableResultProps {
   result: ResultData;

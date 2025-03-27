@@ -1,25 +1,15 @@
 import { Search, AlertCircle, RefreshCw, BugPlay } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { toast } from 'react-hot-toast'
 import { useState, useRef, useEffect } from 'react'
+import { useResultStore } from '../../store/useResultStore'
 
 interface SearchFormProps {
-  regNumber: string;
-  loading: boolean;
-  onSubmit: (e: React.FormEvent) => Promise<void>;
-  onRegNumberChange: (value: string) => void;
-  error?: string;
-  onRetry?: () => void;
+  windowWidth?: number;
 }
 
-export const SearchForm = ({
-  regNumber,
-  loading,
-  onSubmit,
-  onRegNumberChange,
-  error,
-  onRetry
-}: SearchFormProps) => {
+export const SearchForm = ({ windowWidth = 0 }: SearchFormProps) => {
+  const { regNumber, loading, error, setRegNumber, submitSearch, resetError } = useResultStore()
+  
   const yearRef = useRef<HTMLInputElement>(null)
   const numberRef = useRef<HTMLInputElement>(null)
   const [year, setYear] = useState('')
@@ -62,24 +52,15 @@ export const SearchForm = ({
 
   const updateRegNumber = (yearValue: string, numberValue: string) => {
     const newRegNumber = `${yearValue}${yearValue ? '-ag-' : ''}${numberValue}`
-    onRegNumberChange(newRegNumber.toLowerCase())
+    setRegNumber(newRegNumber.toLowerCase())
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const regNumberPattern = /^\d{4}-ag-\d{1,6}$/i
-    if (!regNumberPattern.test(regNumber)) {
-      toast.error('Please enter a valid registration number', {
-        id: 'format-error',
-        duration: 2000
-      })
-      return
-    }
-    await onSubmit(e)
+    await submitSearch()
   }
 
   useEffect(() => {
-    // Parse existing regNumber if any
     const match = regNumber.match(/^(\d{4})-ag-(\d{1,6})$/)
     if (match) {
       setYear(match[1])
@@ -147,17 +128,18 @@ export const SearchForm = ({
             <div className="ml-2">
               <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
               <div className="mt-2 flex gap-2">
-                {onRetry && (
-                  <button
-                    type="button"
-                    onClick={onRetry}
-                    disabled={loading}
-                    className="inline-flex items-center gap-2 text-sm font-medium px-3 py-2 bg-red-100 dark:bg-red-800/30 text-red-700 dark:text-red-300 rounded-md hover:bg-red-200 dark:hover:bg-red-800/50 transition-colors"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                    Try Again
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    resetError();
+                    submitSearch();
+                  }}
+                  disabled={loading}
+                  className="inline-flex items-center gap-2 text-sm font-medium px-3 py-2 bg-red-100 dark:bg-red-800/30 text-red-700 dark:text-red-300 rounded-md hover:bg-red-200 dark:hover:bg-red-800/50 transition-colors"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Try Again
+                </button>
                 <a
                   href="/contact"
                   className="inline-flex items-center gap-2 text-sm font-medium px-3 py-2 bg-gray-100 dark:bg-gray-800/30 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800/50 transition-colors"

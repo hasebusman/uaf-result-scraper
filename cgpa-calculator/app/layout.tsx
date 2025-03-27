@@ -1,7 +1,7 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "./components/Navbar";
-import { ClientLayout } from './components/ClientLayout';
+import { Navbar } from "./components/ui/Navbar";
+import { ClientLayout } from './components/layout/ClientLayout';
 import { Metadata } from 'next'
 import { keywords } from './utils/keywords'
 
