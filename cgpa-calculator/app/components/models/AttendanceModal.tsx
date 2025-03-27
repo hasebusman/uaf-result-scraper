@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CourseRow } from '../../types';
-import { X, Loader2, Plus, CheckCircle, Circle, ChevronDown } from 'lucide-react';
+import { X, Loader2, Plus, CheckCircle, Circle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useResultStore } from '../../store/useResultStore';
 
@@ -150,107 +150,129 @@ export const AttendanceModal = () => {
   if (!attendanceModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-2 sm:p-4 backdrop-blur-sm">
       <motion.div 
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] sm:max-h-[80vh] overflow-hidden"
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] sm:max-h-[80vh] overflow-hidden border dark:border-gray-700"
       >
-        <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Attendance System Data</h2>
+        <div className="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">
+            Import Attendance System Data
+          </h2>
           <button 
             onClick={closeAttendanceModal}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            aria-label="Close modal"
           >
             <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
         
-        <div className="p-3 sm:p-4 overflow-auto max-h-[calc(90vh-110px)] sm:max-h-[calc(80vh-120px)]">
+        <div className="p-4 sm:p-5 overflow-auto max-h-[calc(90vh-130px)] sm:max-h-[calc(80vh-140px)]">
           {loading ? (
-            <div className="flex flex-col items-center justify-center h-32 sm:h-40">
-              <Loader2 className="w-7 h-7 sm:w-8 sm:h-8 animate-spin text-blue-500" />
-              <span className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">Loading attendance data...</span>
+            <div className="flex flex-col items-center justify-center h-40 sm:h-48">
+              <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 animate-spin text-blue-500" />
+              <span className="mt-3 text-sm sm:text-base text-gray-600 dark:text-gray-300">Loading attendance data...</span>
             </div>
           ) : error ? (
-            <div className="text-red-500 text-center p-3 sm:p-4 text-sm sm:text-base">
+            <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-center p-4 rounded-lg text-sm sm:text-base border border-red-200 dark:border-red-800">
               {error}
             </div>
           ) : attendanceData.length === 0 ? (
-            <div className="text-gray-600 dark:text-gray-300 text-center p-3 sm:p-4 text-sm sm:text-base">
+            <div className="bg-gray-50 dark:bg-gray-700/30 text-gray-600 dark:text-gray-300 text-center p-4 rounded-lg text-sm sm:text-base border border-gray-200 dark:border-gray-700">
               No attendance data found.
             </div>
           ) : (
             <>
-              <div className="mb-3 sm:mb-4 flex justify-between items-center">
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-                  {showAllCourses 
-                    ? `Showing all courses (${attendanceData.length})` 
-                    : `Showing new courses (${newCoursesCount})`}
-                </p>
+              <div className="mb-4 sm:mb-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <div>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                    {showAllCourses 
+                      ? `Showing all courses (${attendanceData.length})` 
+                      : `Showing new courses (${newCoursesCount})`}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Select courses to add to your calculation
+                  </p>
+                </div>
                 <button
                   onClick={() => setShowAllCourses(!showAllCourses)}
-                  className="px-2 sm:px-3 py-1 text-xs sm:text-sm bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600"
+                  className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center"
                 >
-                  {showAllCourses ? 'Show New Only' : 'Show All'}
+                  {showAllCourses ? 'Show New Only' : 'Show All Courses'}
                 </button>
               </div>
               
               {displayedCourses.length === 0 ? (
-                <div className="text-center p-3 sm:p-4 text-sm text-gray-600 dark:text-gray-300">
-                  No new courses found. Click 'Show All' to see all courses.
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 text-center">
+                  <p className="text-amber-700 dark:text-amber-400 text-sm">
+                    No new courses found. Click 'Show All Courses' to see all courses.
+                  </p>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {displayedCourses.map((course, index) => (
                     <div 
                       key={index} 
-                      className={`p-2 sm:p-3 border rounded-lg flex flex-col sm:flex-row sm:items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 ${
+                      className={`p-3 sm:p-4 border rounded-lg flex flex-col sm:flex-row sm:items-center justify-between transition-colors ${
                         selectedCourses[course.course_code] 
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-sm' 
                           : 'border-gray-200 dark:border-gray-700'
                       } ${existingCourseCodes.includes(course.course_code) ? 'border-l-4 border-l-amber-500' : ''}`}
+                      onClick={() => handleToggleCourse(course.course_code)}
                     >
-                      <div className="flex-grow mr-2 mb-2 sm:mb-0">
-                        <div className="font-medium text-gray-900 dark:text-gray-100 flex items-center text-sm sm:text-base">
-                          <span onClick={() => handleToggleCourse(course.course_code)} className="cursor-pointer flex-grow truncate">
-                            {course.course_code} - {course.course_title || 'Unknown Course'}
-                          </span>
-                          {existingCourseCodes.includes(course.course_code) && (
-                            <span className="ml-1 sm:ml-2 px-1 sm:px-2 py-0.5 text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 rounded">
-                              Existing
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
-                          {course.semester} | Grade: {course.grade} | Total: {course.total}
+                      <div className="flex-grow mr-2 mb-3 sm:mb-0 cursor-pointer">
+                        <div className="flex items-center">
+                          <div
+                            className="mr-2 text-blue-600 dark:text-blue-400 flex-shrink-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleCourse(course.course_code);
+                            }}
+                          >
+                            {selectedCourses[course.course_code] ? (
+                              <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+                            ) : (
+                              <Circle className="w-5 h-5 sm:w-6 sm:h-6" />
+                            )}
+                          </div>
+                          <div className="flex-grow">
+                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm sm:text-base">
+                              {course.course_code} - {course.course_title || 'Unknown Course'}
+                              {existingCourseCodes.includes(course.course_code) && (
+                                <span className="ml-2 px-2 py-0.5 text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 rounded">
+                                  Already Added
+                                </span>
+                              )}
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 mt-1.5">
+                              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                                <span className="font-medium">Semester:</span> {course.semester}
+                              </div>
+                              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                                <span className="font-medium">Grade:</span> {course.grade || 'N/A'}
+                              </div>
+                              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                                <span className="font-medium">Total:</span> {course.total || 'N/A'}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                       
-                      <div className="flex items-center justify-end space-x-2 sm:space-x-3">
-                        <div className="relative">
-                          <select
-                            value={creditHours[course.course_code] || "3"}
-                            onChange={(e) => handleCreditHoursChange(course.course_code, e.target.value)}
-                            className="pl-2 pr-6 py-1 text-xs sm:text-sm border dark:bg-gray-700 dark:border-gray-600 rounded appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            {[1, 2, 3, 4, 5, 6].map((hours) => (
-                              <option key={hours} value={hours}>{hours} CH</option>
-                            ))}
-                          </select>
-                          <div className="absolute inset-y-0 right-0 flex items-center pr-1 pointer-events-none">
-                            <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
-                          </div>
-                        </div>
-                        
-                        <div className="text-blue-600 dark:text-blue-400 cursor-pointer" onClick={() => handleToggleCourse(course.course_code)}>
-                          {selectedCourses[course.course_code] ? (
-                            <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />
-                          ) : (
-                            <Circle className="w-5 h-5 sm:w-6 sm:h-6" />
-                          )}
-                        </div>
+                      <div className="relative sm:ml-2 " onClick={(e) => e.stopPropagation()}>
+                        <select
+                          value={creditHours[course.course_code] || "3"}
+                          onChange={(e) => handleCreditHoursChange(course.course_code, e.target.value)}
+                          className="pl-3 pr-8 py-1.5 text-sm  border dark:bg-gray-700 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          aria-label="Set credit hours"
+                        >
+                          {[1, 2, 3, 4, 5, 6].map((hours) => (
+                            <option key={hours} value={hours}>{hours} Credit Hours</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                   ))}
@@ -260,19 +282,19 @@ export const AttendanceModal = () => {
           )}
         </div>
         
-        <div className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+        <div className="p-4 sm:p-5 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
           <button
             onClick={closeAttendanceModal}
-            className="px-3 sm:px-4 py-1.5 sm:py-2 mr-2 text-xs sm:text-sm text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 dark:text-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+            className="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 dark:text-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleAddSelectedCourses}
             disabled={loading || displayedCourses.length === 0 || !Object.values(selectedCourses).some(selected => selected)}
-            className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center text-xs sm:text-sm"
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center text-sm transition-colors"
           >
-            <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+            <Plus className="w-4 h-4 mr-1.5" />
             Add Selected Courses
           </button>
         </div>
