@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { scraper } from '@/lib/scraper';
 
@@ -22,15 +21,11 @@ export async function GET(request: NextRequest) {
       }, { status: 400 });
     }
 
-    const result = await scraper.getResult(regNumber);
+    const attendanceData = await scraper.getAttendanceData(regNumber);
     
     return NextResponse.json({
       status: 'success',
-      data: {
-        metadata: result.metadata,
-        student_info: result.student_info,
-        result_table: result.result_table
-      }
+      data: attendanceData
     });
   } catch (error) {
     console.error('API Error:', error);

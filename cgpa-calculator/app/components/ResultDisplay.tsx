@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion'
-import { BookOpen, Download, Loader2 } from 'lucide-react'
+import { BookOpen, Download, Loader2, Users } from 'lucide-react'
 import { SemesterCard } from './SemesterCard'
 import { CourseRow, ResultData } from '../types'
 import { groupBySemester, calculateSemesterCGPA, calculateOverallCGPA, cgpaToPercentage } from '../utils/calculations'
 import { DownloadableResult } from './DownloadableResult';
 import { useEffect, useState } from 'react'
-import { AdBannerInline } from './AdBannerInline'
+import { AttendanceModal } from './AttendanceModal'
 
 interface ResultDisplayProps {
   result: ResultData
@@ -14,6 +14,7 @@ interface ResultDisplayProps {
   windowWidth: number
   onRemoveCourse: (courseCode: string) => void
   onAddCourse: (course: CourseRow) => void
+  onAddCourses: (courses: CourseRow[]) => void
   toggleSemesterExpansion: (semester: string) => void
 }
 
@@ -24,15 +25,16 @@ export const ResultDisplay = ({
   windowWidth,
   onRemoveCourse,
   onAddCourse,
+  onAddCourses,
   toggleSemesterExpansion
 }: ResultDisplayProps) => {
   const [overallCGPA, setOverallCGPA] = useState(0) 
   const [isDownloading, setIsDownloading] = useState(false)
+  const [attendanceModalOpen, setAttendanceModalOpen] = useState(false)
 
   useEffect(() => {
     setOverallCGPA(calculateOverallCGPA(includedCourses))
   }, [includedCourses])
-
 
   const downloadPDF = async () => {
     setIsDownloading(true)
@@ -89,6 +91,10 @@ export const ResultDisplay = ({
     }
   };
 
+  const existingSemesters = [...new Set(includedCourses.map(course => course.semester))];
+  
+  const existingCourseCodes = includedCourses.map(course => course.course_code);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -96,19 +102,27 @@ export const ResultDisplay = ({
       exit={{ opacity: 0, y: 20 }}
       className="space-y-6 min-h-[300px]"
     >
-      <div className="flex justify-end mb-6 h-[40px]"> 
+      <div className="flex justify-between mb-6 h-[40px]">
+        <button
+          onClick={() => setAttendanceModalOpen(true)}
+          aria-label="Check attendance system"
+          className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 h-10 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
+        >
+          <Users className="w-4 h-4" /> Attendance System
+        </button>
+        
         <button
           onClick={downloadPDF}
           disabled={isDownloading}
           aria-label="Download result as PDF"
-          className="inline-flex items-center gap-2 px-4 h-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 h-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed text-sm sm:text-base"
         >
           {isDownloading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
             <Download className="w-4 h-4" />
           )}
-          <span className="inline-block min-w-[80px]"> 
+          <span className="inline-block min-w-[auto] sm:min-w-[80px]"> 
             {isDownloading ? 'Downloading...' : 'Download'}
           </span>
         </button>
@@ -158,6 +172,15 @@ export const ResultDisplay = ({
           </>
         ))}
       </div>
+      
+      <AttendanceModal
+        isOpen={attendanceModalOpen}
+        onClose={() => setAttendanceModalOpen(false)}
+        regNumber={result.student_info.registration_}
+        onAddCourses={onAddCourses}
+        existingSemesters={existingSemesters}
+        existingCourseCodes={existingCourseCodes}
+      />
     </motion.div>
   )
 }

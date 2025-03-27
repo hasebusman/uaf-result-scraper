@@ -59,13 +59,16 @@ export default function Home() {
     }, 300)
 
     try {
-      
+      // Add a small delay to adjust for mobile transitions
+      const mobileDelay = windowWidth < 640 ? 300 : 0;
+      if (mobileDelay) await new Promise(resolve => setTimeout(resolve, mobileDelay));
+
       const response = await fetch(`/api/result?reg_number=${regNumber}`)
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const responseData = await response.json()
 
       if (responseData.status === 'success') {
@@ -119,6 +122,37 @@ export default function Home() {
     });
   };
 
+  const handleAddCourses = (newCourses: CourseRow[]) => {
+    setIncludedCourses(prevCourses => {
+      const existingCourseCodes = new Set(prevCourses.map(course => course.course_code));
+
+      const uniqueNewCourses = newCourses.filter(
+        course => !existingCourseCodes.has(course.course_code)
+      );
+
+      if (uniqueNewCourses.length === 0) {
+        return prevCourses;
+      }
+
+      // Sort courses by semester to maintain consistency
+      const updatedCourses = [...prevCourses, ...uniqueNewCourses].sort((a, b) => {
+        // First compare by semester
+        if (a.semester < b.semester) return -1;
+        if (a.semester > b.semester) return 1;
+        
+        // If same semester, compare by course code
+        return a.course_code.localeCompare(b.course_code);
+      });
+
+      resetOverallCGPA();
+      const groupedSemesters = groupBySemester(updatedCourses);
+      Object.values(groupedSemesters).forEach(semesterCourses => {
+        calculateSemesterCGPA(semesterCourses);
+      });
+      return updatedCourses;
+    });
+  };
+
   const toggleSemesterExpansion = (semester: string) => {
     if (windowWidth < 1024) {
       setExpandedSemesters(prev =>
@@ -133,7 +167,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative">
       <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8 text-gray-700 dark:text-gray-300">
         <Header />
-        <div className="min-h-[100px]"> 
+        <div className="min-h-[100px]">
           <SearchForm
             regNumber={regNumber}
             loading={loading}
@@ -146,9 +180,9 @@ export default function Home() {
             }}
           />
         </div>
-        
+
         <AnimatePresence mode="wait">
-          <div className=""> 
+          <div className="">
             {loading ? (
               <LoadingSpinner progress={progress} />
             ) : (
@@ -160,6 +194,7 @@ export default function Home() {
                   windowWidth={windowWidth}
                   onRemoveCourse={handleRemoveCourse}
                   onAddCourse={handleAddCourse}
+                  onAddCourses={handleAddCourses}
                   toggleSemesterExpansion={toggleSemesterExpansion}
                 />
               )
@@ -170,20 +205,20 @@ export default function Home() {
         <CalculationSystem />
         <Footer />
       </div>
-      
-      <div 
+
+      <div
         className="fixed top-0 -left-4 w-[400px] h-[400px] bg-gradient-to-r from-blue-500 to-purple-500 opacity-[0.25] rounded-full blur-[80px] transform -translate-y-1/2 z-[-1]"
         style={{
           transform: `translate(-50%, ${scrollPosition * 0.2}px) rotate(${scrollPosition * 0.1}deg)`
         }}
       />
-      <div 
+      <div
         className="fixed bottom-0 -right-4 w-[400px] h-[400px] bg-gradient-to-l from-violet-500 to-indigo-500 opacity-[0.25] rounded-full blur-[80px] transform translate-y-1/2 z-[-1]"
         style={{
           transform: `translate(50%, ${-scrollPosition * 0.2}px) rotate(${-scrollPosition * 0.1}deg)`
         }}
       />
-      <div 
+      <div
         className="fixed top-1/2 left-1/2 w-[900px] h-[900px] bg-gradient-to-tr from-indigo-500/30 to-purple-500/30 opacity-[0.2] rounded-full blur-[100px] transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[-1]"
         style={{
           transform: `translate(-50%, -50%) rotate(${scrollPosition * 0.05}deg)`
