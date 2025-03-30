@@ -14,6 +14,7 @@
     "@emailjs/browser": "^4.4.1",
     "@headlessui/react": "^2.2.0",
     "@radix-ui/react-tabs": "^1.1.2",
+    "@react-pdf/renderer": "^4.3.0",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -27,7 +28,7 @@
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^2.5.2",
     "lucide-react": "^0.468.0",
-    "next": "^14.0.0",
+    "next": "^15.2.4",
     "next-sitemap": "^4.2.3",
     "next-themes": "^0.4.4",
     "postcss": "^8",
@@ -35,7 +36,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.5.1",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.1",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "critters": "^0.0.23",

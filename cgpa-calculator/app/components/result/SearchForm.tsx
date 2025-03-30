@@ -1,25 +1,14 @@
 import { Search, AlertCircle, RefreshCw, BugPlay } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { toast } from 'react-hot-toast'
 import { useState, useRef, useEffect } from 'react'
+import { useResultStore } from '../../store/useResultStore'
 
 interface SearchFormProps {
-  regNumber: string;
-  loading: boolean;
-  onSubmit: (e: React.FormEvent) => Promise<void>;
-  onRegNumberChange: (value: string) => void;
-  error?: string;
-  onRetry?: () => void;
+  windowWidth?: number;
 }
 
-export const SearchForm = ({
-  regNumber,
-  loading,
-  onSubmit,
-  onRegNumberChange,
-  error,
-  onRetry
-}: SearchFormProps) => {
+export const SearchForm = ({ windowWidth = 0 }: SearchFormProps) => {
+  const { regNumber, loading, error, setRegNumber, submitSearch, resetError } = useResultStore()
+  
   const yearRef = useRef<HTMLInputElement>(null)
   const numberRef = useRef<HTMLInputElement>(null)
   const [year, setYear] = useState('')
@@ -62,24 +51,15 @@ export const SearchForm = ({
 
   const updateRegNumber = (yearValue: string, numberValue: string) => {
     const newRegNumber = `${yearValue}${yearValue ? '-ag-' : ''}${numberValue}`
-    onRegNumberChange(newRegNumber.toLowerCase())
+    setRegNumber(newRegNumber.toLowerCase())
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const regNumberPattern = /^\d{4}-ag-\d{1,6}$/i
-    if (!regNumberPattern.test(regNumber)) {
-      toast.error('Please enter a valid registration number', {
-        id: 'format-error',
-        duration: 2000
-      })
-      return
-    }
-    await onSubmit(e)
+    await submitSearch()
   }
 
   useEffect(() => {
-    // Parse existing regNumber if any
     const match = regNumber.match(/^(\d{4})-ag-(\d{1,6})$/)
     if (match) {
       setYear(match[1])
@@ -88,12 +68,9 @@ export const SearchForm = ({
   }, [])
 
   return (
-    <motion.form
+    <form
       onSubmit={handleSubmit}
-      className="w-full max-w-lg mx-auto mb-8 z-50 "
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      className="w-full max-w-lg mx-auto mb-8 z-50"
     >
       <div className="relative w-full">
         <div className="flex items-center gap-1.5 p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm focus-within:ring-2 focus-within:ring-blue-500/50 transition-all shadow-md w-full">
@@ -137,9 +114,7 @@ export const SearchForm = ({
         </div>
       </div>
       {error && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div
           className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
         >
           <div className="flex items-start">
@@ -147,17 +122,18 @@ export const SearchForm = ({
             <div className="ml-2">
               <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
               <div className="mt-2 flex gap-2">
-                {onRetry && (
-                  <button
-                    type="button"
-                    onClick={onRetry}
-                    disabled={loading}
-                    className="inline-flex items-center gap-2 text-sm font-medium px-3 py-2 bg-red-100 dark:bg-red-800/30 text-red-700 dark:text-red-300 rounded-md hover:bg-red-200 dark:hover:bg-red-800/50 transition-colors"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                    Try Again
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    resetError();
+                    submitSearch();
+                  }}
+                  disabled={loading}
+                  className="inline-flex items-center gap-2 text-sm font-medium px-3 py-2 bg-red-100 dark:bg-red-800/30 text-red-700 dark:text-red-300 rounded-md hover:bg-red-200 dark:hover:bg-red-800/50 transition-colors"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Try Again
+                </button>
                 <a
                   href="/contact"
                   className="inline-flex items-center gap-2 text-sm font-medium px-3 py-2 bg-gray-100 dark:bg-gray-800/30 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800/50 transition-colors"
@@ -168,9 +144,9 @@ export const SearchForm = ({
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       )}
-    </motion.form>
+    </form>
   )
 }
 

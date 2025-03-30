@@ -1,35 +1,40 @@
 import { useState } from 'react'
 import { BookOpen, Trash2, ChevronDown, ChevronUp, Info, Plus } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getGradeColor } from '../utils/gradeUtils'
-import { CourseRow } from '../types'
-import { calculateGradePoints, cgpaToPercentage } from '../utils/calculations'
-import { CourseDetailModal } from './CourseDetailModal'
-import { AddCourseModal } from './AddCourseModal'
+import { getGradeColor } from '../../utils/gradeUtils'
+import { CourseRow } from '../../types'
+import { calculateGradePoints, cgpaToPercentage, calculateSemesterCGPA } from '../../utils/calculations'
+import { CourseDetailModal } from '../models/CourseDetailModal'
+import { AddCourseModal } from '../models/AddCourseModal' 
+import { useResultStore } from '../../store/useResultStore';
 
 export interface SemesterCardProps {
   semester: string;
-  courses: CourseRow[];
-  semesterCGPA: number;
-  onRemoveCourse: (courseCode: string) => void;
-  isExpanded: boolean;
-  onToggleExpand: () => void;
   isMobile: boolean;
-  onAddCourse: (course: CourseRow) => void;
 }
 
 export const SemesterCard = ({
   semester,
-  courses,
-  semesterCGPA,
-  onRemoveCourse,
-  isExpanded,
-  onToggleExpand,
-  isMobile,
-  onAddCourse
+  isMobile
 }: SemesterCardProps) => {
+  const { 
+    expandedSemesters, 
+    toggleSemesterExpansion, 
+    removeCourse, 
+    addCourse,
+    includedCourses
+  } = useResultStore();
+  
+
+  const courses = includedCourses.filter(course => course.semester === semester);
+  const semesterCGPA = calculateSemesterCGPA(courses);
   const [selectedCourse, setSelectedCourse] = useState<CourseRow | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const isExpanded = expandedSemesters.includes(semester);
+  
+  const handleToggleExpand = () => {
+    toggleSemesterExpansion(semester);
+  };
 
   const tableContent = (
     <table className="w-full text-sm lg:text-base">
@@ -70,7 +75,7 @@ export const SemesterCard = ({
             </td>
             <td className="px-1 lg:px-2 py-2.5 lg:py-3.5">
               <button
-                onClick={() => onRemoveCourse(course.course_code)} 
+                onClick={() => removeCourse(course.course_code)} 
                 className="text-[10px] lg:text-xs text-red-500 hover:text-red-700 transition-colors"
                 title="Remove course"
               >
@@ -89,7 +94,7 @@ export const SemesterCard = ({
         <div className="p-4">
           <div
             className={`flex items-center justify-between mb-4 ${isMobile ? 'cursor-pointer' : ''}`}
-            onClick={isMobile ? onToggleExpand : undefined}
+            onClick={isMobile ? handleToggleExpand : undefined}
           >
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -156,7 +161,7 @@ export const SemesterCard = ({
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         semester={semester}
-        onAddCourse={onAddCourse}
+        onAddCourse={addCourse}
       />
     </>
   )

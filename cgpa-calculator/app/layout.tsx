@@ -1,7 +1,7 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "./components/Navbar";
-import { ClientLayout } from './components/ClientLayout';
+import { Navbar } from "./components/ui/Navbar";
+import { ClientLayout } from './components/layout/ClientLayout';
 import { Metadata } from 'next'
 import { keywords } from './utils/keywords'
 
@@ -13,17 +13,17 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: {
-    default: "UAF CGPA Calculator | Calculate Your University GPA Easily",
+    default: "UAF CGPA Calculator | Calculate Your UAF CGPA and GPA Easily",
     template: "%s | UAF CGPA Calculator"
   },
-  description: "CGPA Calculator for University of Agriculture Faisalabad (UAF) students. Calculate UAF semester GPA and CGPA instantly. Trusted by UAF students across all departments and programs.",
+  description: "CGPA Calculator for UAF students. Calculate UAF semester GPA and CGPA instantly. Trusted by UAF students across all departments and programs.",
   keywords: keywords,
   icons: {
     icon: '/icon.png'
   },
   openGraph: {
-    title: 'UAF CGPA Calculator | Fast & Accurate University GPA Calculator',
-    description: 'Calculate your UAF CGPA instantly. Free tool for University of Agriculture Faisalabad students.',
+    title: 'UAF CGPA Calculator | Fast & Accurate UAF GPA Calculator',
+    description: 'Calculate your UAF CGPA and GPA instantly. Free tool for University of Agriculture Faisalabad students.',
     images: [
       {
         url: 'https://uafcalculator.live/og-image.png',

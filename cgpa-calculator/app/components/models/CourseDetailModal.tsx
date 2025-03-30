@@ -1,8 +1,8 @@
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
 import { X } from 'lucide-react'
-import { CourseRow } from '../types'
-import { getGradeColor } from '../utils/gradeUtils'
+import { CourseRow } from '../../types'
+import { getGradeColor } from '../../utils/gradeUtils'
 
 interface CourseDetailModalProps {
 	isOpen: boolean
