@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { ResultData, CourseRow } from '../../types';
+import { ResultData,CourseRow } from '@/app/types'; 
 import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Font, DocumentProps } from '@react-pdf/renderer';
 import { Loader2, Download } from 'lucide-react';
 import { calculateOverallCGPA, calculateSemesterCGPA, groupBySemester, cgpaToPercentage } from '../../utils/calculations';
@@ -385,31 +385,13 @@ const PDFDownloadButton = ({ document, fileName }: {
 };
 
 export function DownloadButton({ result, includedCourses }: DownloadButtonProps) {
-  const [isPdfReady, setIsPdfReady] = useState(false);
-  
   const pdfDocument = useMemo(() => {
-    if (!isPdfReady) return null;
     return <ResultPDF result={result} includedCourses={includedCourses} />;
-  }, [result, includedCourses, isPdfReady]);
+  }, [result, includedCourses]);
   
   const fileName = `${result.student_info.registration_}.pdf`;
 
-  if (!isPdfReady) {
-    return (
-      <button
-        onClick={() => setIsPdfReady(true)}
-        aria-label="Prepare PDF"
-        className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 h-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
-      >
-        <Download className="w-4 h-4" />
-        <span className="inline-block min-w-[auto] sm:min-w-[80px]">
-          Download
-        </span>
-      </button>
-    );
-  }
-
   return (
-    <PDFDownloadButton document={pdfDocument!} fileName={fileName} />
+    <PDFDownloadButton document={pdfDocument} fileName={fileName} />
   );
 }
