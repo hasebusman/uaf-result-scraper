@@ -120,7 +120,7 @@ export const SearchForm = ({ windowWidth = 0 }: SearchFormProps) => {
           <div className="flex items-start">
             <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
             <div className="ml-2">
-              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+              <p className="text-sm text-red-600 dark:text-red-400">Make sure the Ag no is correct! {error} </p>
               <div className="mt-2 flex gap-2">
                 <button
                   type="button"
