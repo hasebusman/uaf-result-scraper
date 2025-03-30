@@ -1,7 +1,7 @@
 import { Dialog } from '@headlessui/react'
 import { X } from 'lucide-react'
 import { useState } from 'react'
-import { CourseRow } from '../types'
+import { CourseRow } from '@/app/types'
 
 interface AddCourseModalProps {
   isOpen: boolean
