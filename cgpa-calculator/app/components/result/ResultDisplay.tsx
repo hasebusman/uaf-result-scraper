@@ -5,7 +5,12 @@ import { groupBySemester, calculateSemesterCGPA, calculateOverallCGPA, cgpaToPer
 import { useEffect, useState } from 'react'
 import { AttendanceModal } from '../models/AttendanceModal'
 import { useResultStore } from '../../store/useResultStore'
-import { DownloadButton } from './PDFDownload'
+import dynamic from 'next/dynamic'
+
+const PDFDownloadButton = dynamic(
+  () => import('./PDFDownloadButton').then(mod => mod.PDFDownloadButton),
+  { ssr: false }
+);
 
 interface ResultDisplayProps {
   windowWidth: number
@@ -13,8 +18,8 @@ interface ResultDisplayProps {
 
 export const ResultDisplay = ({ windowWidth }: ResultDisplayProps) => {
   const { result, includedCourses, openAttendanceModal } = useResultStore()
-
   const [overallCGPA, setOverallCGPA] = useState(0)
+  
   if (!result) return null;
 
   useEffect(() => {
@@ -40,7 +45,8 @@ export const ResultDisplay = ({ windowWidth }: ResultDisplayProps) => {
             <Users className="w-4 h-4" /> Attendance System Result
           </button>
 
-          <DownloadButton result={result} includedCourses={includedCourses} />
+          {/* PDF download button */}
+          <PDFDownloadButton result={result} includedCourses={includedCourses} />
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 min-h-[150px]" id="result-card">

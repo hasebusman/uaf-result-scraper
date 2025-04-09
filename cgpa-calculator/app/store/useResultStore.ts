@@ -89,12 +89,20 @@ export const useResultStore = create<ResultState>((set, get) => ({
   
   removeCourse: (courseCode) => {
     set((state) => {
-      const newCourses = state.includedCourses.filter(course => course.course_code !== courseCode);
+      // Create a safe copy of the courses
+      const newCourses = [...state.includedCourses].filter(course => course.course_code !== courseCode);
+      
+      // Reset CGPA calculations
       resetOverallCGPA();
-      const groupedSemesters = groupBySemester(newCourses);
-      Object.values(groupedSemesters).forEach(semesterCourses => {
-        calculateSemesterCGPA(semesterCourses);
-      });
+      
+      // Only process if we have courses
+      if (newCourses.length > 0) {
+        const groupedSemesters = groupBySemester(newCourses);
+        Object.values(groupedSemesters).forEach(semesterCourses => {
+          calculateSemesterCGPA(semesterCourses);
+        });
+      }
+      
       return { includedCourses: newCourses };
     });
   },

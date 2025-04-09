@@ -49,9 +49,9 @@ export const SemesterCard = ({
         </tr>
       </thead>
       <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-        {courses.map((course) => (
+        {courses.map((course,index) => (
           <tr
-            key={course.course_code}
+            key={index}
             className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
           >
             <td className="px-1 lg:px-3 py-2.5 lg:py-3.5 text-[11px] lg:text-sm">
