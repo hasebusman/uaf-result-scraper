@@ -1,20 +1,32 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { ResultData,CourseRow } from '@/app/types'; 
-import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Font, DocumentProps } from '@react-pdf/renderer';
+import { useState, useEffect, useMemo } from 'react';
+import { ResultData, CourseRow } from '@/app/types'; 
 import { Loader2, Download } from 'lucide-react';
 import { calculateOverallCGPA, calculateSemesterCGPA, groupBySemester, cgpaToPercentage } from '../../utils/calculations';
+import dynamic from 'next/dynamic';
 
-Font.register({
-  family: 'Roboto',
-  fonts: [
-    { src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-light-webfont.ttf', fontWeight: 300 },
-    { src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf', fontWeight: 400 },
-    { src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf', fontWeight: 500 },
-    { src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-bold-webfont.ttf', fontWeight: 700 }
-  ]
-});
+const PDFDownloadLink = dynamic(
+  () => import('@react-pdf/renderer').then(mod => mod.PDFDownloadLink),
+  { ssr: false }
+);
+import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
+
+const registerFonts = () => {
+  if (typeof window !== 'undefined') {
+    import('@react-pdf/renderer').then(({ Font }) => {
+      Font.register({
+        family: 'Roboto',
+        fonts: [
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-light-webfont.ttf', fontWeight: 300 },
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf', fontWeight: 400 },
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf', fontWeight: 500 },
+          { src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-bold-webfont.ttf', fontWeight: 700 }
+        ]
+      });
+    });
+  }
+};
 
 const styles = StyleSheet.create({
   page: {
@@ -320,8 +332,9 @@ interface DownloadButtonProps {
   includedCourses: CourseRow[];
 }
 
-const PDFDownloadButton = ({ document, fileName }: { 
-  document: React.ReactElement<DocumentProps, string | React.JSXElementConstructor<any>>, 
+// Create a client-side only component for the PDF download button
+const ClientSidePDFButton = ({ document, fileName }: { 
+  document: React.ReactElement, 
   fileName: string 
 }) => {
   const [isError, setIsError] = useState(false);
@@ -385,13 +398,48 @@ const PDFDownloadButton = ({ document, fileName }: {
 };
 
 export function DownloadButton({ result, includedCourses }: DownloadButtonProps) {
+  const [isClient, setIsClient] = useState(false);
+  
+  // Register fonts on client side only
+  useEffect(() => {
+    setIsClient(true);
+    registerFonts();
+  }, []);
+  
   const pdfDocument = useMemo(() => {
+    if (!isClient) return null;
     return <ResultPDF result={result} includedCourses={includedCourses} />;
-  }, [result, includedCourses]);
+  }, [result, includedCourses, isClient]);
   
   const fileName = `${result.student_info.registration_}.pdf`;
 
-  return (
-    <PDFDownloadButton document={pdfDocument} fileName={fileName} />
+  if (!isClient) {
+    return (
+      <button
+        disabled
+        aria-label="Preparing download..."
+        className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 h-10 bg-blue-400 text-white rounded-lg transition-colors text-sm sm:text-base"
+      >
+        <Loader2 className="w-4 h-4 animate-spin" />
+        <span className="inline-block min-w-[auto] sm:min-w-[80px]">
+          Loading...
+        </span>
+      </button>
+    );
+  }
+
+  return pdfDocument ? (
+    <ClientSidePDFButton document={pdfDocument} fileName={fileName} />
+  ) : (
+    <button
+      disabled
+      aria-label="Preparing download..."
+      className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 h-10 bg-blue-400 text-white rounded-lg transition-colors text-sm sm:text-base"
+    >
+      <Loader2 className="w-4 h-4 animate-spin" />
+      <span className="inline-block min-w-[auto] sm:min-w-[80px]">
+        Loading...
+      </span>
+    </button>
   );
 }
