@@ -10,7 +10,7 @@ const PDFDownloadLink = dynamic(
   () => import('@react-pdf/renderer').then(mod => mod.PDFDownloadLink),
   { ssr: false }
 );
-import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Font, DocumentProps } from '@react-pdf/renderer';
 
 const registerFonts = () => {
   if (typeof window !== 'undefined') {
@@ -334,7 +334,7 @@ interface DownloadButtonProps {
 
 // Create a client-side only component for the PDF download button
 const ClientSidePDFButton = ({ document, fileName }: { 
-  document: React.ReactElement, 
+  document: React.ReactElement<DocumentProps>, 
   fileName: string 
 }) => {
   const [isError, setIsError] = useState(false);
