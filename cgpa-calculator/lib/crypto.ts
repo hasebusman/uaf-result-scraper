@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-const NEXT_PUBLIC_SECRET_KEY = process.env.NEXT_PUBLIC_SECRET_KEY ||'';
+const SECRET_KEY = process.env.SECRET_KEY || '';
 
 /**
  * Generate HMAC-SHA256 hash for API request validation
@@ -9,9 +9,9 @@ const NEXT_PUBLIC_SECRET_KEY = process.env.NEXT_PUBLIC_SECRET_KEY ||'';
  * @returns Base64 encoded hash
  */
 export function generateHash(timestamp: string, regNumber?: string): string {
-  const data = `${timestamp}:${regNumber || ''}:${NEXT_PUBLIC_SECRET_KEY}`;
+  const data = `${timestamp}:${regNumber || ''}:${SECRET_KEY}`;
   return crypto
-    .createHmac('sha256', NEXT_PUBLIC_SECRET_KEY)
+    .createHmac('sha256', SECRET_KEY)
     .update(data)
     .digest('base64');
 }
@@ -26,10 +26,12 @@ export function generateHash(timestamp: string, regNumber?: string): string {
 export function validateHash(receivedHash: string, timestamp: string, regNumber?: string): boolean {
   try {
     const expectedHash = generateHash(timestamp, regNumber);
-    return crypto.timingSafeEqual(
+    const res = crypto.timingSafeEqual(
       Buffer.from(receivedHash, 'base64'),
       Buffer.from(expectedHash, 'base64')
     );
+    console.log("res", res)
+    return res;
   } catch (error) {
     return false;
   }
@@ -44,7 +46,7 @@ export function isTimestampValid(timestamp: string): boolean {
   const now = Date.now();
   const requestTime = parseInt(timestamp);
   const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
-  
+
   return Math.abs(now - requestTime) <= fiveMinutes;
 }
 
@@ -60,6 +62,6 @@ export function generateClientHash(timestamp?: string, regNumber?: string): { ti
   // This is a simplified version for demonstration
   const data = `${ts}:${regNumber || ''}`;
   const hash = Buffer.from(data).toString('base64');
-  
+
   return { timestamp: ts, hash };
 }
