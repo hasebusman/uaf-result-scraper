@@ -1,6 +1,5 @@
 /**
- * Generate a simple hash for client-side API requests
- * Note: This is not cryptographically secure but provides basic request validation
+ * Generate a hash for client-side API requests that matches server expectations
  * @param timestamp - Current timestamp
  * @param regNumber - Registration number (optional)
  * @returns Object with timestamp and hash
@@ -8,14 +7,23 @@
 export function generateClientHash(timestamp?: string, regNumber?: string): { timestamp: string; hash: string } {
   const ts = timestamp || Date.now().toString();
   
-  // Simple hash generation for client-side
-  // In production, you might want to use a more sophisticated approach
-  const data = `${ts}:${regNumber || ''}:client-salt`;
+  // Use a simplified hash that can be validated on server
+  // This creates a deterministic hash without requiring crypto libraries on client
+  const data = `${ts}:${regNumber || ''}:client-key`;
   
-  // Convert to base64 for transmission
-  const hash = btoa(data);
+  // Create a simple but consistent hash
+  let hash = 0;
+  for (let i = 0; i < data.length; i++) {
+    const char = data.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
   
-  return { timestamp: ts, hash };
+  // Convert to base64 string for transmission
+  const hashString = Math.abs(hash).toString(16).padStart(8, '0') + ts.slice(-4);
+  const finalHash = btoa(hashString);
+  
+  return { timestamp: ts, hash: finalHash };
 }
 
 /**
