@@ -61,7 +61,9 @@ npm run dev
 
 ## License
 
-MIT License - feel free to use and modify for your needs.
+This project is **not licensed for public use**. All rights reserved.  
+If you wish to use or modify this code, please contact the owner for permission.
+
 
 ## Support
 

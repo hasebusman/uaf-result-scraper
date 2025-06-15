@@ -1,5 +1,4 @@
 'use client'
-
 import { useState, useEffect } from 'react'
 import Header from './components/ui/Header'
 import { SearchForm } from './components/result/SearchForm'
