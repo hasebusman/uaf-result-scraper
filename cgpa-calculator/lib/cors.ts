@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateHash, isTimestampValid } from './crypto';
+import { validateHash, validateClientHash, isTimestampValid } from './crypto';
 
 // Add your allowed origins here
 const ALLOWED_ORIGINS = [
@@ -20,9 +20,7 @@ export function corsMiddleware(request: NextRequest) {
     referer.startsWith(allowedOrigin)
   );
   
-  // For development, also allow requests without origin (like direct API calls in dev)
-  const isDevelopment = process.env.NODE_ENV === 'development';
-  const allowRequest = isAllowedOrigin || isAllowedReferer || (isDevelopment && !origin);
+  const allowRequest = isAllowedOrigin || isAllowedReferer ;
   
   return {
     isAllowed: allowRequest,
@@ -50,41 +48,45 @@ export function createCorsErrorResponse(
   message: string = 'Access denied',
   status: number = 403
 ) {
-  return NextResponse.json(
-    { 
-      status: 'error', 
-      message 
-    }, 
-    { 
-      status,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'OPTIONS',
-      }
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+      <h2>${message}</h2>
+      <p><a href="https://www.uafcalculator.live/" target="_blank" style="color: #007bff; text-decoration: none;">Visit this</a></p>
+    </div>
+  `;
+  
+  return new NextResponse(htmlContent, {
+    status,
+    headers: {
+      'Content-Type': 'text/html',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'OPTIONS',
     }
-  );
+  });
 }
 
 export function validateApiRequest(request: NextRequest, regNumber?: string): { isValid: boolean; error?: string } {
   const timestamp = request.headers.get('x-timestamp');
   const hash = request.headers.get('x-hash');
   
-  // In development, skip hash validation
-  if (process.env.NODE_ENV === 'development') {
-    return { isValid: true };
-  }
   
   if (!timestamp || !hash) {
-    return { isValid: false, error: 'Missing authentication headers' };
+    return { isValid: false, error: 'Missing authentication headers - <a href="https://www.uafcalculator.live/" target="_blank">Visit this</a>' };
   }
   
   if (!isTimestampValid(timestamp)) {
-    return { isValid: false, error: 'Request timestamp expired' };
+    return { isValid: false, error: 'Request timestamp expired - <a href="https://www.uafcalculator.live/" target="_blank">Visit this</a>' };
   }
   
-  if (!validateHash(hash, timestamp, regNumber)) {
-    return { isValid: false, error: 'Invalid request signature' };
+  // Try client hash validation first (for browser requests)
+  if (validateClientHash(hash, timestamp, regNumber)) {
+    return { isValid: true };
   }
   
-  return { isValid: true };
+  // Fallback to server hash validation (for server-to-server requests with SECRET_KEY)
+  if (validateHash(hash, timestamp, regNumber)) {
+    return { isValid: true };
+  }
+  
+  return { isValid: false, error: 'Invalid request signature - <a href="https://www.uafcalculator.live/" target="_blank">Visit this</a>' };
 }
