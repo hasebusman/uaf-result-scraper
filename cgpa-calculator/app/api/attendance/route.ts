@@ -1,59 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { scraper } from '@/lib/scraper';
-import { corsMiddleware, createCorsResponse, createCorsErrorResponse, validateApiRequest } from '@/lib/cors';
-
-export async function OPTIONS(request: NextRequest) {
-  const { corsHeaders } = corsMiddleware(request);
-  return new NextResponse(null, { status: 200, headers: corsHeaders });
-}
 
 export async function GET(request: NextRequest) {
-  // Apply CORS middleware
-  const { isAllowed, corsHeaders } = corsMiddleware(request);
-  
-  if (!isAllowed) {
-    return createCorsErrorResponse('Unauthorized access - invalid origin');
-  }
-
   try {
     const searchParams = request.nextUrl.searchParams;
     const regNumber = searchParams.get('reg_number');
 
     if (!regNumber) {
-      return createCorsResponse({ 
+      return NextResponse.json({ 
         status: 'error', 
         message: 'Registration number is required' 
-      }, 400, corsHeaders);
-    }
-
-    // Validate API request hash
-    const { isValid, error } = validateApiRequest(request, regNumber);
-    if (!isValid) {
-      return createCorsResponse({
-        status: 'error',
-        message: error || 'Invalid request authentication'
-      }, 401, corsHeaders);
-    }
-
-    const regNumberPattern = /^\d{4}-ag-\d{1,6}$/i;
-    if (!regNumberPattern.test(regNumber)) {
-      return createCorsResponse({
-        status: 'error',
-        message: 'Invalid registration number format'
-      }, 400, corsHeaders);
+      }, { status: 400 });
     }
 
     const attendanceData = await scraper.getAttendanceData(regNumber);
     
-    return createCorsResponse({
+    return NextResponse.json({
       status: 'success',
       data: attendanceData
-    }, 200, corsHeaders);
+    });
   } catch (error) {
     console.error('API Error:', error);
-    return createCorsResponse({ 
+    return NextResponse.json({ 
       status: 'error', 
       message: error instanceof Error ? error.message : 'Internal server error'
-    }, 500, corsHeaders);
+    }, { status: 500 });
   }
 }
