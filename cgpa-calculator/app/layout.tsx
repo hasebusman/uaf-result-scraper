@@ -82,7 +82,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={poppins.className}>
+      <body className={poppins.className} suppressHydrationWarning>
         <ClientLayout>
           <div className="relative flex min-h-screen flex-col">
             <Navbar />
