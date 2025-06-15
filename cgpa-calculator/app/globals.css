@@ -8,6 +8,7 @@
     --foreground: hsl(222.2, 84%, 4.9%);
     --primary: hsl(221, 83%, 53%);
     --primary-foreground: hsl(210, 40%, 98%);
+    --font-poppins: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   .dark {
@@ -19,8 +20,13 @@
 }
 
 @layer base {
+  * {
+    font-family: var(--font-poppins);
+  }
+  
   body {
     @apply bg-background text-foreground min-h-screen;
+    font-family: var(--font-poppins);
   }
 }
 
