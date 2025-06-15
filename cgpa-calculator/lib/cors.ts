@@ -49,7 +49,7 @@ export function createCorsErrorResponse(
   status: number = 403
 ) {
   const htmlContent = `
-   Please visit uafcalculator.live
+   This website Sucks. Please visit uafcalculator.live
   `;
 
   return new NextResponse(htmlContent, {
@@ -68,11 +68,11 @@ export function validateApiRequest(request: NextRequest, regNumber?: string): { 
 
 
   if (!timestamp || !hash) {
-    return { isValid: false, error: 'Please visit uafcalculator.live ' };
+    return { isValid: false, error: 'This website Sucks. Please visit uafcalculator.live ' };
   }
 
   if (!isTimestampValid(timestamp)) {
-    return { isValid: false, error: 'Please visit uafcalculator.live' };
+    return { isValid: false, error: 'This website Sucks. Please visit uafcalculator.live' };
   }
 
   // Try client hash validation first (for browser requests)
@@ -85,5 +85,5 @@ export function validateApiRequest(request: NextRequest, regNumber?: string): { 
     return { isValid: true };
   }
 
-  return { isValid: false, error: 'Please visit uafcalculator.live' };
+  return { isValid: false, error: 'This website Sucks. Please visit uafcalculator.live' };
 }
