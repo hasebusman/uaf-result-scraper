@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { toast } from 'react-hot-toast';
 import { ResultData, CourseRow } from '../types';
 import { calculateSemesterCGPA, groupBySemester, resetOverallCGPA } from '../utils/calculations';
+import { createAuthHeaders } from '@/lib/clientCrypto';
 
 interface ResultState {
   regNumber: string;
@@ -53,7 +54,13 @@ export const useResultStore = create<ResultState>((set, get) => ({
     }, 300);
     
     try {
-      const response = await fetch(`/api/result?reg_number=${regNumber}`);
+      // Generate authentication headers
+      const authHeaders = createAuthHeaders(regNumber);
+      
+      const response = await fetch(`/api/result?reg_number=${regNumber}`, {
+        method: 'GET',
+        headers: authHeaders,
+      });
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
