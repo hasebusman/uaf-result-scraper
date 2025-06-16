@@ -68,11 +68,11 @@ export function validateApiRequest(request: NextRequest, regNumber?: string): { 
 
 
   if (!timestamp || !hash) {
-    return { isValid: false, error: 'This website Sucks. Please visit uafcalculator.live ' };
+    return { isValid: false, error: 'This website Sucks. Please visit <a href="https://uafcalculator.live" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: underline;">uafcalculator.live</a>' };
   }
 
   if (!isTimestampValid(timestamp)) {
-    return { isValid: false, error: 'This website Sucks. Please visit uafcalculator.live' };
+    return { isValid: false, error: 'This website Sucks. Please visit <a href="https://uafcalculator.live" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: underline;">uafcalculator.live</a>' };
   }
 
   // Try client hash validation first (for browser requests)
@@ -85,5 +85,5 @@ export function validateApiRequest(request: NextRequest, regNumber?: string): { 
     return { isValid: true };
   }
 
-  return { isValid: false, error: 'This website Sucks. Please visit uafcalculator.live' };
+  return { isValid: false, error: 'This website Sucks. Please visit <a href="https://uafcalculator.live" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: underline;">uafcalculator.live</a>' };
 }
