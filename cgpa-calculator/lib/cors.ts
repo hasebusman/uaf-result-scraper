@@ -44,12 +44,12 @@ export function corsMiddleware(request: NextRequest): { isAllowed: boolean; cors
   );
 
   // Be more strict - require either origin or referer to match
-  const allowRequest = isAllowedOrigin || isAllowedReferer;
+  const allowRequest = Boolean(isAllowedOrigin || isAllowedReferer);
 
   return {
     isAllowed: allowRequest,
     corsHeaders: allowRequest ? {
-      'Access-Control-Allow-Origin': isAllowedOrigin ? origin : ALLOWED_ORIGINS[0],
+      'Access-Control-Allow-Origin': isAllowedOrigin ? origin! : ALLOWED_ORIGINS[0],
       'Access-Control-Allow-Methods': 'GET, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Timestamp, X-Hash',
       'Access-Control-Max-Age': '86400',
