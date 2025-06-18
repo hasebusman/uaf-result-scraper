@@ -16,6 +16,7 @@ const BLOCKED_ORIGINS = [
   'https://www.thecgpacalculator.com',
   'http://www.thecgpacalculator.com',
 ];
+const ErrorMessage = `This website Sucks 😐. Please visit uafcalculator.live`;
 
 export function corsMiddleware(request: NextRequest): { isAllowed: boolean; corsHeaders: Record<string, string> } {
   const origin = request.headers.get('origin');
@@ -93,11 +94,11 @@ export function validateApiRequest(request: NextRequest, regNumber?: string): { 
   const hash = request.headers.get('x-hash');
 
   if (!timestamp || !hash) {
-    return { isValid: false, error: 'Missing authentication headers' };
+    return { isValid: false, error: ErrorMessage };
   }
 
   if (!isTimestampValid(timestamp)) {
-    return { isValid: false, error: 'Request expired' };
+    return { isValid: false, error: ErrorMessage };
   }
 
   // Try client hash validation first (for browser requests)
@@ -110,5 +111,5 @@ export function validateApiRequest(request: NextRequest, regNumber?: string): { 
     return { isValid: true };
   }
 
-  return { isValid: false, error: 'Invalid authentication' };
+  return { isValid: false, error: ErrorMessage };
 }
