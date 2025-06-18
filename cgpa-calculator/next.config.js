@@ -3,6 +3,10 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   transpilePackages: ['jspdf', 'jspdf-autotable'],
+      serverActions: {
+      allowedOrigins: ['https://www.uafcalculator.live'],
+    },
+
   webpack: (config) => {
     config.resolve.fallback = { 
       fs: false,

@@ -59,51 +59,42 @@ export function isTimestampValid(timestamp: string): boolean {
  */
 export function validateClientHash(receivedHash: string, timestamp: string, regNumber?: string): boolean {
   try {
-    // List of allowed domains for client hash validation
-    const allowedDomains = ['localhost', 'uafcalculator.live', 'www.uafcalculator.live', 'server'];
-    
-    // Simplified user agent patterns
-    const userAgentPatterns = ['server', 'Mozilla/5.0 ('];
-    
     console.log('Validating client hash:', { receivedHash, timestamp, regNumber });
     
-    // Try validation with each allowed domain
-    for (const domain of allowedDomains) {
-      for (const userAgent of userAgentPatterns) {
-        const data = `${timestamp}:${regNumber || ''}:${domain}:${userAgent}:client-key`;
-        
-        let hash = 0;
-        for (let i = 0; i < data.length; i++) {
-          const char = data.charCodeAt(i);
-          hash = ((hash << 5) - hash) + char;
-          hash = hash & hash; 
-        }
-        
-        const entropy = Math.abs(hash ^ timestamp.length ^ (regNumber?.length || 0));
-        const hashString = Math.abs(hash).toString(16).padStart(8, '0') + 
-                          entropy.toString(16).padStart(4, '0') + 
-                          timestamp.slice(-4);
-        const expectedHash = Buffer.from(hashString).toString('base64');
-        
-        console.log('Trying domain/UA:', { domain, userAgent, data, expectedHash });
-        
-        try {
-          if (crypto.timingSafeEqual(
-            Buffer.from(receivedHash, 'base64'),
-            Buffer.from(expectedHash, 'base64')
-          )) {
-            console.log("✅ Client hash validated for domain:", domain, "userAgent:", userAgent);
-            return true;
-          }
-        } catch (e) {
-          console.log('Buffer comparison failed for:', domain, userAgent);
-          continue;
-        }
-      }
+    // Use the same simple approach as client
+    const data = `${timestamp}:${regNumber || ''}:uaf-client-auth`;
+    
+    let hash = 0;
+    for (let i = 0; i < data.length; i++) {
+      const char = data.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; 
     }
     
-    console.log("❌ Client hash validation failed for all combinations");
-    return false;
+    const hashString = Math.abs(hash).toString(16).padStart(8, '0') + timestamp.slice(-4);
+    const expectedHash = Buffer.from(hashString).toString('base64');
+    
+    console.log('Generated data:', data);
+    console.log('Expected hash:', expectedHash);
+    console.log('Received hash:', receivedHash);
+    
+    try {
+      const isValid = crypto.timingSafeEqual(
+        Buffer.from(receivedHash, 'base64'),
+        Buffer.from(expectedHash, 'base64')
+      );
+      
+      if (isValid) {
+        console.log("✅ Client hash validated successfully");
+        return true;
+      } else {
+        console.log("❌ Hash mismatch");
+        return false;
+      }
+    } catch (e) {
+      console.log('Buffer comparison failed:', e);
+      return false;
+    }
   } catch (error) {
     console.error('Client hash validation error:', error);
     return false;
@@ -119,12 +110,8 @@ export function validateClientHash(receivedHash: string, timestamp: string, regN
 export function generateClientHash(timestamp?: string, regNumber?: string): { timestamp: string; hash: string } {
   const ts = timestamp || Date.now().toString();
   
-  // Use server domain for server-side generation
-  const domain = 'server';
-  const userAgent = 'server';
-  
-  // Use the same algorithm as validateClientHash for consistency
-  const data = `${ts}:${regNumber || ''}:${domain}:${userAgent}:client-key`;
+  // Use the same simple algorithm as validateClientHash
+  const data = `${ts}:${regNumber || ''}:uaf-client-auth`;
   
   let hash = 0;
   for (let i = 0; i < data.length; i++) {
@@ -133,10 +120,7 @@ export function generateClientHash(timestamp?: string, regNumber?: string): { ti
     hash = hash & hash; // Convert to 32-bit integer
   }
   
-  const entropy = Math.abs(hash ^ ts.length ^ (regNumber?.length || 0));
-  const hashString = Math.abs(hash).toString(16).padStart(8, '0') + 
-                     entropy.toString(16).padStart(4, '0') + 
-                     ts.slice(-4);
+  const hashString = Math.abs(hash).toString(16).padStart(8, '0') + ts.slice(-4);
   const finalHash = Buffer.from(hashString).toString('base64');
 
   return { timestamp: ts, hash: finalHash };

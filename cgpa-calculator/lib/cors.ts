@@ -20,7 +20,6 @@ const BLOCKED_ORIGINS = [
 export function corsMiddleware(request: NextRequest): { isAllowed: boolean; corsHeaders: Record<string, string> } {
   const origin = request.headers.get('origin');
   const referer = request.headers.get('referer');
-  const userAgent = request.headers.get('user-agent');
 
   // Check if the request is from a blocked origin
   const isBlockedOrigin = origin && BLOCKED_ORIGINS.some(blocked => 
@@ -43,15 +42,19 @@ export function corsMiddleware(request: NextRequest): { isAllowed: boolean; cors
     referer.startsWith(allowedOrigin)
   );
 
-  // Be more strict - require either origin or referer to match
-  const allowRequest = Boolean(isAllowedOrigin || isAllowedReferer);
+  // For same-origin requests (no origin header), check referer
+  const isSameOrigin = !origin && referer && ALLOWED_ORIGINS.some(allowedOrigin =>
+    referer.startsWith(allowedOrigin)
+  );
+
+  const allowRequest = Boolean(isAllowedOrigin || isAllowedReferer || isSameOrigin);
 
   return {
     isAllowed: allowRequest,
     corsHeaders: allowRequest ? {
-      'Access-Control-Allow-Origin': isAllowedOrigin ? origin! : ALLOWED_ORIGINS[0],
+      'Access-Control-Allow-Origin': isAllowedOrigin ? origin! : '*',
       'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Timestamp, X-Hash',
+      'Access-Control-Allow-Headers': 'Content-Type, X-Timestamp, X-Hash',
       'Access-Control-Max-Age': '86400',
     } : {}
   };
@@ -88,35 +91,24 @@ export function createCorsErrorResponse(
 export function validateApiRequest(request: NextRequest, regNumber?: string): { isValid: boolean; error?: string } {
   const timestamp = request.headers.get('x-timestamp');
   const hash = request.headers.get('x-hash');
-  const origin = request.headers.get('origin');
-  const referer = request.headers.get('referer');
-
-  console.log('API Request validation:', { timestamp, hash: hash?.substring(0, 10) + '...', origin, referer, regNumber });
 
   if (!timestamp || !hash) {
-    console.log('❌ Missing timestamp or hash');
-    return { isValid: false, error: 'This website Sucks. Please visit uafcalculator.live ' };
+    return { isValid: false, error: 'Missing authentication headers' };
   }
 
   if (!isTimestampValid(timestamp)) {
-    console.log('❌ Invalid timestamp');
-    return { isValid: false, error: 'This website Sucks. Please visit uafcalculator.live' };
+    return { isValid: false, error: 'Request expired' };
   }
 
   // Try client hash validation first (for browser requests)
-  console.log('🔍 Attempting client hash validation...');
   if (validateClientHash(hash, timestamp, regNumber)) {
-    console.log('✅ Client hash validation successful');
     return { isValid: true };
   }
 
   // Fallback to server hash validation (for server-to-server requests with SECRET_KEY)
-  console.log('🔍 Attempting server hash validation...');
   if (validateHash(hash, timestamp, regNumber)) {
-    console.log('✅ Server hash validation successful');
     return { isValid: true };
   }
 
-  console.log('❌ All hash validations failed');
-  return { isValid: false, error: 'This website Sucks. Please visit uafcalculator.live' };
+  return { isValid: false, error: 'Invalid authentication' };
 }
