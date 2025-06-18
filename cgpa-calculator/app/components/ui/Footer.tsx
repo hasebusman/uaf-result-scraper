@@ -45,7 +45,7 @@ export const Footer = () => {
 							<Linkedin className="w-5 h-5" />
 						</a>
 						<a
-							href="https://github.com/haseebusman0305"
+							href="https://github.com/haseeb-usman"
 							target="_blank"
 							rel="noopener noreferrer"
 							aria-label="Open GitHub profile"

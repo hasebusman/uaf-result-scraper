@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { GraduationCap, Mail, Home, Menu, X, Github, Star, Moon, Sun } from "lucide-react"
+import { GraduationCap, Mail, Home, Menu, X, Moon, Sun } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "next-themes"
 
@@ -51,19 +51,6 @@ export function Navbar() {
                 <span>{link.label}</span>
               </Link>
             ))}
-            <a
-              href="https://github.com/haseebusman0305/uaf-result-scraper"
-              target="_blank"
-              aria-label="Open GitHub profile"
-              rel="noopener noreferrer"
-              className="nav-link flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
-            >
-              <div className="flex items-center gap-1.5">
-                <Star className="h-4 w-4" />
-                <span>on </span>
-                <Github className="h-5 w-5" />
-              </div>
-            </a>
             {mounted && (
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -119,18 +106,7 @@ export function Navbar() {
                   <span>{link.label}</span>
                 </Link>
               ))}
-              <a
-                href="https://github.com/haseebusman0305/uaf-result-scraper"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700"
-              >
-                <div className="flex items-center gap-1.5">
-                  <Star className="h-4 w-4" />
-                  <span> on</span>
-                  <Github className="h-5 w-5" />
-                </div>
-              </a>
+
             </nav>
           </motion.div>
         )}
