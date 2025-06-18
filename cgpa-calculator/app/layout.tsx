@@ -4,6 +4,7 @@ import { Navbar } from "./components/ui/Navbar";
 import { ClientLayout } from './components/layout/ClientLayout';
 import { Metadata } from 'next'
 import { keywords } from './utils/keywords'
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -94,7 +95,9 @@ export default function RootLayout({
             <Navbar />
             {children}
           </div>
+          <SpeedInsights/>
         </ClientLayout>
+
       </body>
     </html>
   );
