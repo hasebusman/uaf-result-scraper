@@ -5,14 +5,37 @@ import { validateHash, validateClientHash, isTimestampValid } from './crypto';
 const ALLOWED_ORIGINS = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'https://uafcalculator.live', // Replace with your actual domain
-  'https://www.uafcalculator.live', // Replace with your actual domain
-  // Add any other domains you want to allow
+  'https://uafcalculator.live',
+  'https://www.uafcalculator.live',
+];
+
+// Blocked domains/origins
+const BLOCKED_ORIGINS = [
+  'https://thecgpacalculator.com',
+  'http://thecgpacalculator.com',
+  'https://www.thecgpacalculator.com',
+  'http://www.thecgpacalculator.com',
 ];
 
 export function corsMiddleware(request: NextRequest) {
   const origin = request.headers.get('origin');
   const referer = request.headers.get('referer');
+  const userAgent = request.headers.get('user-agent');
+
+  // Check if the request is from a blocked origin
+  const isBlockedOrigin = origin && BLOCKED_ORIGINS.some(blocked => 
+    origin.includes(blocked.replace(/https?:\/\//, ''))
+  );
+  const isBlockedReferer = referer && BLOCKED_ORIGINS.some(blocked =>
+    referer.includes(blocked.replace(/https?:\/\//, ''))
+  );
+
+  if (isBlockedOrigin || isBlockedReferer) {
+    return {
+      isAllowed: false,
+      corsHeaders: {}
+    };
+  }
 
   // Check if the request is from an allowed origin
   const isAllowedOrigin = origin && ALLOWED_ORIGINS.includes(origin);
@@ -20,16 +43,17 @@ export function corsMiddleware(request: NextRequest) {
     referer.startsWith(allowedOrigin)
   );
 
+  // Be more strict - require either origin or referer to match
   const allowRequest = isAllowedOrigin || isAllowedReferer;
 
   return {
     isAllowed: allowRequest,
-    corsHeaders: {
+    corsHeaders: allowRequest ? {
       'Access-Control-Allow-Origin': isAllowedOrigin ? origin : ALLOWED_ORIGINS[0],
       'Access-Control-Allow-Methods': 'GET, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Timestamp, X-Hash',
       'Access-Control-Max-Age': '86400',
-    }
+    } : {}
   };
 }
 
@@ -56,8 +80,8 @@ export function createCorsErrorResponse(
     status,
     headers: {
       'Content-Type': 'text/html',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'OPTIONS',
+      // Remove wildcard CORS for error responses
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
     }
   });
 }
