@@ -3,7 +3,12 @@ import { scraper } from '@/lib/scraper';
 import { corsMiddleware, createCorsResponse, createCorsErrorResponse, validateApiRequest } from '@/lib/cors';
 
 export async function OPTIONS(request: NextRequest) {
-  const { corsHeaders } = corsMiddleware(request);
+  const { isAllowed, corsHeaders } = corsMiddleware(request);
+  
+  if (!isAllowed) {
+    return createCorsErrorResponse('Unauthorized access - invalid origin');
+  }
+  
   return new NextResponse(null, { status: 200, headers: corsHeaders });
 }
 

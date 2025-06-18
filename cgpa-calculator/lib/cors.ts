@@ -17,7 +17,7 @@ const BLOCKED_ORIGINS = [
   'http://www.thecgpacalculator.com',
 ];
 
-export function corsMiddleware(request: NextRequest) {
+export function corsMiddleware(request: NextRequest): { isAllowed: boolean; corsHeaders: Record<string, string> } {
   const origin = request.headers.get('origin');
   const referer = request.headers.get('referer');
   const userAgent = request.headers.get('user-agent');
