@@ -80,7 +80,6 @@ export function createCorsErrorResponse(
     status,
     headers: {
       'Content-Type': 'text/html',
-      // Remove wildcard CORS for error responses
       'Cache-Control': 'no-cache, no-store, must-revalidate',
     }
   });
@@ -89,25 +88,35 @@ export function createCorsErrorResponse(
 export function validateApiRequest(request: NextRequest, regNumber?: string): { isValid: boolean; error?: string } {
   const timestamp = request.headers.get('x-timestamp');
   const hash = request.headers.get('x-hash');
+  const origin = request.headers.get('origin');
+  const referer = request.headers.get('referer');
 
+  console.log('API Request validation:', { timestamp, hash: hash?.substring(0, 10) + '...', origin, referer, regNumber });
 
   if (!timestamp || !hash) {
+    console.log('❌ Missing timestamp or hash');
     return { isValid: false, error: 'This website Sucks. Please visit uafcalculator.live ' };
   }
 
   if (!isTimestampValid(timestamp)) {
+    console.log('❌ Invalid timestamp');
     return { isValid: false, error: 'This website Sucks. Please visit uafcalculator.live' };
   }
 
   // Try client hash validation first (for browser requests)
+  console.log('🔍 Attempting client hash validation...');
   if (validateClientHash(hash, timestamp, regNumber)) {
+    console.log('✅ Client hash validation successful');
     return { isValid: true };
   }
 
   // Fallback to server hash validation (for server-to-server requests with SECRET_KEY)
+  console.log('🔍 Attempting server hash validation...');
   if (validateHash(hash, timestamp, regNumber)) {
+    console.log('✅ Server hash validation successful');
     return { isValid: true };
   }
 
+  console.log('❌ All hash validations failed');
   return { isValid: false, error: 'This website Sucks. Please visit uafcalculator.live' };
 }
