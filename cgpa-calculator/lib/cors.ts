@@ -1,29 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateHash, validateClientHash, isTimestampValid } from './crypto';
 
-// Add your allowed origins here
-const ALLOWED_ORIGINS = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'https://uafcalculator.live',
-  'https://www.uafcalculator.live',
-];
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : [];
 
-// Blocked domains/origins
-const BLOCKED_ORIGINS = [
-  'https://thecgpacalculator.com',
-  'http://thecgpacalculator.com',
-  'https://www.thecgpacalculator.com',
-  'http://www.thecgpacalculator.com',
-];
-const ErrorMessage = `This website Sucks 😐. Please visit uafcalculator.live`;
+const BLOCKED_ORIGINS = process.env.BLOCKED_ORIGINS
+  ? process.env.BLOCKED_ORIGINS.split(',').map(origin => origin.trim())
+  : [];
 
 export function corsMiddleware(request: NextRequest): { isAllowed: boolean; corsHeaders: Record<string, string> } {
   const origin = request.headers.get('origin');
   const referer = request.headers.get('referer');
 
-  // Check if the request is from a blocked origin
-  const isBlockedOrigin = origin && BLOCKED_ORIGINS.some(blocked => 
+  const isBlockedOrigin = origin && BLOCKED_ORIGINS.some(blocked =>
     origin.includes(blocked.replace(/https?:\/\//, ''))
   );
   const isBlockedReferer = referer && BLOCKED_ORIGINS.some(blocked =>
@@ -37,13 +27,11 @@ export function corsMiddleware(request: NextRequest): { isAllowed: boolean; cors
     };
   }
 
-  // Check if the request is from an allowed origin
   const isAllowedOrigin = origin && ALLOWED_ORIGINS.includes(origin);
   const isAllowedReferer = referer && ALLOWED_ORIGINS.some(allowedOrigin =>
     referer.startsWith(allowedOrigin)
   );
 
-  // For same-origin requests (no origin header), check referer
   const isSameOrigin = !origin && referer && ALLOWED_ORIGINS.some(allowedOrigin =>
     referer.startsWith(allowedOrigin)
   );
@@ -73,19 +61,13 @@ export function createCorsResponse(
 }
 
 export function createCorsErrorResponse(
-  message: string = 'Access denied',
-  status: number = 403
+  error: string,
+  status: number = 400,
+  corsHeaders: Record<string, string> = {}
 ) {
-  const htmlContent = `
-   This website Sucks. Please visit uafcalculator.live
-  `;
-
-  return new NextResponse(htmlContent, {
+  return NextResponse.json({ status: 'error', message: error }, {
     status,
-    headers: {
-      'Content-Type': 'text/html',
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-    }
+    headers: corsHeaders
   });
 }
 
@@ -94,22 +76,20 @@ export function validateApiRequest(request: NextRequest, regNumber?: string): { 
   const hash = request.headers.get('x-hash');
 
   if (!timestamp || !hash) {
-    return { isValid: false, error: ErrorMessage };
+    return { isValid: false, error: 'Missing authentication headers' };
   }
 
   if (!isTimestampValid(timestamp)) {
-    return { isValid: false, error: ErrorMessage };
+    return { isValid: false, error: 'Request timestamp expired' };
   }
 
-  // Try client hash validation first (for browser requests)
   if (validateClientHash(hash, timestamp, regNumber)) {
     return { isValid: true };
   }
 
-  // Fallback to server hash validation (for server-to-server requests with SECRET_KEY)
   if (validateHash(hash, timestamp, regNumber)) {
     return { isValid: true };
   }
 
-  return { isValid: false, error: ErrorMessage };
+  return { isValid: false, error: 'Invalid authentication hash' };
 }

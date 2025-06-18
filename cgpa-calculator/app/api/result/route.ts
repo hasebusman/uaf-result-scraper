@@ -13,7 +13,6 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  // Apply CORS middleware
   const { isAllowed, corsHeaders } = corsMiddleware(request);
   
   if (!isAllowed) {

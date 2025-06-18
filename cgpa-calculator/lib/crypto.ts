@@ -1,12 +1,14 @@
 import crypto from 'crypto';
 
 const SECRET_KEY = process.env.SECRET_KEY || '';
+const CLIENT_AUTH_SECRET = process.env.CLIENT_AUTH_SECRET || 'uaf-client-auth';
+const TIMESTAMP_VALIDITY_MINUTES = parseInt(process.env.TIMESTAMP_VALIDITY_MINUTES || '5');
+const HASH_PADDING_LENGTH = parseInt(process.env.HASH_PADDING_LENGTH || '8');
 
 /**
- * Generate HMAC-SHA256 hash for API request validation
- * @param timestamp - Current timestamp
- * @param regNumber - Registration number (optional)
- * @returns Base64 encoded hash
+ * @param timestamp 
+ * @param regNumber 
+ * @returns 
  */
 export function generateHash(timestamp: string, regNumber?: string): string {
   const data = `${timestamp}:${regNumber || ''}:${SECRET_KEY}`;
@@ -17,11 +19,10 @@ export function generateHash(timestamp: string, regNumber?: string): string {
 }
 
 /**
- * Validate HMAC-SHA256 hash from API request
- * @param receivedHash - Hash received from client
- * @param timestamp - Timestamp from client
- * @param regNumber - Registration number (optional)
- * @returns Boolean indicating if hash is valid
+ * @param receivedHash 
+ * @param timestamp 
+ * @param regNumber
+ * @returns
  */
 export function validateHash(receivedHash: string, timestamp: string, regNumber?: string): boolean {
   try {
@@ -38,31 +39,28 @@ export function validateHash(receivedHash: string, timestamp: string, regNumber?
 }
 
 /**
- * Check if timestamp is within acceptable range (5 minutes)
- * @param timestamp - Timestamp to validate
- * @returns Boolean indicating if timestamp is valid
+ * @param timestamp 
+ * @returns 
  */
 export function isTimestampValid(timestamp: string): boolean {
   const now = Date.now();
   const requestTime = parseInt(timestamp);
-  const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
+  const validityWindow = TIMESTAMP_VALIDITY_MINUTES * 60 * 1000;
 
-  return Math.abs(now - requestTime) <= fiveMinutes;
+  return Math.abs(now - requestTime) <= validityWindow;
 }
 
 /**
- * Validate client-side hash (for browser requests)
- * @param receivedHash - Hash received from client
- * @param timestamp - Timestamp from client
- * @param regNumber - Registration number (optional)
- * @returns Boolean indicating if hash is valid
+ * @param receivedHash 
+ * @param timestamp 
+ * @param regNumber 
+ * @returns 
  */
 export function validateClientHash(receivedHash: string, timestamp: string, regNumber?: string): boolean {
   try {
     console.log('Validating client hash:', { receivedHash, timestamp, regNumber });
     
-    // Use the same simple approach as client
-    const data = `${timestamp}:${regNumber || ''}:uaf-client-auth`;
+    const data = `${timestamp}:${regNumber || ''}:${CLIENT_AUTH_SECRET}`;
     
     let hash = 0;
     for (let i = 0; i < data.length; i++) {
@@ -71,7 +69,7 @@ export function validateClientHash(receivedHash: string, timestamp: string, regN
       hash = hash & hash; 
     }
     
-    const hashString = Math.abs(hash).toString(16).padStart(8, '0') + timestamp.slice(-4);
+    const hashString = Math.abs(hash).toString(16).padStart(HASH_PADDING_LENGTH, '0') + timestamp.slice(-4);
     const expectedHash = Buffer.from(hashString).toString('base64');
     
     console.log('Generated data:', data);
@@ -85,10 +83,10 @@ export function validateClientHash(receivedHash: string, timestamp: string, regN
       );
       
       if (isValid) {
-        console.log("✅ Client hash validated successfully");
+        console.log("Client hash validated successfully");
         return true;
       } else {
-        console.log("❌ Hash mismatch");
+        console.log(" Hash mismatch");
         return false;
       }
     } catch (e) {
@@ -102,25 +100,23 @@ export function validateClientHash(receivedHash: string, timestamp: string, regN
 }
 
 /**
- * Generate client-side hash (for frontend)
- * @param timestamp - Current timestamp
- * @param regNumber - Registration number (optional)
- * @returns Object with timestamp and hash
+ * @param timestamp 
+ * @param regNumber 
+ * @returns
  */
 export function generateClientHash(timestamp?: string, regNumber?: string): { timestamp: string; hash: string } {
   const ts = timestamp || Date.now().toString();
   
-  // Use the same simple algorithm as validateClientHash
-  const data = `${ts}:${regNumber || ''}:uaf-client-auth`;
+  const data = `${ts}:${regNumber || ''}:${CLIENT_AUTH_SECRET}`;
   
   let hash = 0;
   for (let i = 0; i < data.length; i++) {
     const char = data.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
+    hash = hash & hash;
   }
   
-  const hashString = Math.abs(hash).toString(16).padStart(8, '0') + ts.slice(-4);
+  const hashString = Math.abs(hash).toString(16).padStart(HASH_PADDING_LENGTH, '0') + ts.slice(-4);
   const finalHash = Buffer.from(hashString).toString('base64');
 
   return { timestamp: ts, hash: finalHash };
