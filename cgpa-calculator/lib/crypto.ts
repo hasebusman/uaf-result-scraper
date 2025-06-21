@@ -59,29 +59,29 @@ export function isTimestampValid(timestamp: string): boolean {
 export function validateClientHash(receivedHash: string, timestamp: string, regNumber?: string): boolean {
   try {
 
-    
+
     const data = `${timestamp}:${regNumber || ''}:${CLIENT_AUTH_SECRET}`;
-    
+
     let hash = 0;
     for (let i = 0; i < data.length; i++) {
       const char = data.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; 
+      hash = hash & hash;
     }
-    
+
     const hashString = Math.abs(hash).toString(16).padStart(HASH_PADDING_LENGTH, '0') + timestamp.slice(-4);
     const expectedHash = Buffer.from(hashString).toString('base64');
-    
+
     try {
       const isValid = crypto.timingSafeEqual(
         Buffer.from(receivedHash, 'base64'),
         Buffer.from(expectedHash, 'base64')
       );
-      
+
       if (isValid) {
-\        return true;
+        return true;
       } else {
-\        return false;
+        return false;
       }
     } catch (e) {
       console.log('Buffer comparison failed:', e);
@@ -100,16 +100,16 @@ export function validateClientHash(receivedHash: string, timestamp: string, regN
  */
 export function generateClientHash(timestamp?: string, regNumber?: string): { timestamp: string; hash: string } {
   const ts = timestamp || Date.now().toString();
-  
+
   const data = `${ts}:${regNumber || ''}:${CLIENT_AUTH_SECRET}`;
-  
+
   let hash = 0;
   for (let i = 0; i < data.length; i++) {
     const char = data.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
     hash = hash & hash;
   }
-  
+
   const hashString = Math.abs(hash).toString(16).padStart(HASH_PADDING_LENGTH, '0') + ts.slice(-4);
   const finalHash = Buffer.from(hashString).toString('base64');
 
