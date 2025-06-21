@@ -58,7 +58,7 @@ export function isTimestampValid(timestamp: string): boolean {
  */
 export function validateClientHash(receivedHash: string, timestamp: string, regNumber?: string): boolean {
   try {
-    console.log('Validating client hash:', { receivedHash, timestamp, regNumber });
+
     
     const data = `${timestamp}:${regNumber || ''}:${CLIENT_AUTH_SECRET}`;
     
@@ -72,10 +72,6 @@ export function validateClientHash(receivedHash: string, timestamp: string, regN
     const hashString = Math.abs(hash).toString(16).padStart(HASH_PADDING_LENGTH, '0') + timestamp.slice(-4);
     const expectedHash = Buffer.from(hashString).toString('base64');
     
-    console.log('Generated data:', data);
-    console.log('Expected hash:', expectedHash);
-    console.log('Received hash:', receivedHash);
-    
     try {
       const isValid = crypto.timingSafeEqual(
         Buffer.from(receivedHash, 'base64'),
@@ -83,11 +79,9 @@ export function validateClientHash(receivedHash: string, timestamp: string, regN
       );
       
       if (isValid) {
-        console.log("Client hash validated successfully");
-        return true;
+\        return true;
       } else {
-        console.log(" Hash mismatch");
-        return false;
+\        return false;
       }
     } catch (e) {
       console.log('Buffer comparison failed:', e);
