@@ -30,9 +30,9 @@ const formatCreditHours = (hours: string): string => {
 export const AddCourseModal = ({ isOpen, onClose, semester, onAddCourse }: AddCourseModalProps) => {
   const initialState = {
     courseCode: '',
+    courseTitle: '',
     creditHours: '',
     obtainedMarks: '',
-    totalMarks: '',
   };
 
   const [courseData, setCourseData] = useState(initialState)
@@ -41,8 +41,9 @@ export const AddCourseModal = ({ isOpen, onClose, semester, onAddCourse }: AddCo
     e.preventDefault()
     
     const obtained = parseFloat(courseData.obtainedMarks);
-    const total = parseFloat(courseData.totalMarks);
-    const grade = calculateGrade(obtained, total);
+    const creditHours = parseInt(courseData.creditHours);
+    const totalMarks = creditHours * 20; // Calculate total marks as credit hours * 20
+    const grade = calculateGrade(obtained, totalMarks);
     
     const newCourse: CourseRow = {
       semester: semester,
@@ -56,7 +57,7 @@ export const AddCourseModal = ({ isOpen, onClose, semester, onAddCourse }: AddCo
       practical: "0",
       sr: new Date().getTime().toString(),
       teacher_name: "",
-      course_title: ""
+      course_title: courseData.courseTitle || courseData.courseCode // Use course title if provided, otherwise use course code
     }
 
     onAddCourse(newCourse)
@@ -114,31 +115,36 @@ export const AddCourseModal = ({ isOpen, onClose, semester, onAddCourse }: AddCo
                   ))}
                 </select>
               </div>
-              <div>
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Course Title <span className="text-gray-400">(Optional)</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., Introduction to Computer Science"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2 text-sm"
+                  value={courseData.courseTitle}
+                  onChange={(e) => setCourseData(prev => ({ ...prev, courseTitle: e.target.value }))}
+                />
+              </div>
+              <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Obtained Marks
+                  {courseData.creditHours && (
+                    <span className="text-gray-400 ml-1">
+                      (out of {parseInt(courseData.creditHours) * 20})
+                    </span>
+                  )}
                 </label>
                 <input
                   type="number"
                   required
                   min="0"
+                  max={courseData.creditHours ? parseInt(courseData.creditHours) * 20 : undefined}
                   step="0.1"
                   className="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2 text-sm"
                   value={courseData.obtainedMarks}
                   onChange={(e) => setCourseData(prev => ({ ...prev, obtainedMarks: e.target.value }))}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Total Marks
-                </label>
-                <input
-                  type="number"
-                  required
-                  min="1"
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2 text-sm"
-                  value={courseData.totalMarks}
-                  onChange={(e) => setCourseData(prev => ({ ...prev, totalMarks: e.target.value }))}
                 />
               </div>
             </div>
