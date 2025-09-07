@@ -1,16 +1,32 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { CONFIG } from './config';
-import type { CourseRow, ResultData } from '../../app/types'; 
+import type { CourseRow, ResultData } from '../../app/types';
+import https from 'https'; 
+
+// Create a custom HTTPS agent that allows insecure connections (for development only)
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false // WARNING: This is not secure for production
+});
 
 export class UAFScraper {
   private async submitFormAndGetResult(regNumber: string): Promise<string> {
     try {
-      const loginPageResponse = await axios.get(CONFIG.LOGIN_URL, {
+      // Log connection attempt for debugging
+      console.debug(`Attempting to connect to ${CONFIG.LOGIN_URL} for registration number ${regNumber}`);
+      
+      // Make sure URLs use HTTPS not HTTP
+      const loginUrl = CONFIG.LOGIN_URL.replace('http://', 'https://');
+      const resultUrl = CONFIG.RESULT_URL.replace('http://', 'https://');
+      
+      const loginPageResponse = await axios.get(loginUrl, {
         headers: {
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        },
+        httpsAgent // Use the custom HTTPS agent to ignore certificate issues
       });
 
       const cookies = loginPageResponse.headers['set-cookie'];
@@ -27,19 +43,25 @@ export class UAFScraper {
       formData.append('Register', regNumber);
       formData.append('token', token);
 
-      const resultResponse = await axios.post(CONFIG.RESULT_URL, formData, {
+      console.debug(`Submitting form to ${resultUrl} with token extracted`);
+
+      const resultResponse = await axios.post(resultUrl, formData, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-          'Origin': 'http://lms.uaf.edu.pk',
-          'Referer': CONFIG.LOGIN_URL,
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+          'Origin': loginUrl.substring(0, loginUrl.lastIndexOf('/')),
+          'Referer': loginUrl,
           'Cookie': cookieHeader,
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+          'Upgrade-Insecure-Requests': '1'
         },
         maxRedirects: 5,
         validateStatus: null, 
         timeout: CONFIG.AXIOS_TIMEOUT,
-        withCredentials: true
+        withCredentials: true,
+        httpsAgent // Use the custom HTTPS agent here too
       });
 
       if (resultResponse.status !== 200) {
@@ -60,9 +82,21 @@ export class UAFScraper {
 
     } catch (error) {
       if (axios.isAxiosError(error)) {
+        // Enhanced error handling for network issues
+        if (error.code === 'ECONNREFUSED') {
+          throw new Error(`Connection refused to the university server. The server may be down or blocking requests (${error.message}).`);
+        } else if (error.code === 'ENOTFOUND') {
+          throw new Error(`Could not connect to university server. Please check your internet connection or the server may be down (${error.message}).`);
+        } else if (error.timeout) {
+          throw new Error(`Connection timed out. The university server is not responding (${error.message}).`);
+        } else if (error.message.includes('certificate')) {
+          // Handle certificate errors specifically
+          throw new Error(`SSL Certificate error: Unable to establish secure connection to the university server. Using insecure mode for development.`);
+        }
+
         const statusCode = error.response?.status;
         const responseData = error.response?.data;
-        throw new Error(`Network error (${statusCode}): ${responseData || error.message}`);
+        throw new Error(`Network error (${statusCode || 'connection error'}): ${responseData || error.message}`);
       }
       throw error;
     }
@@ -195,7 +229,8 @@ export class UAFScraper {
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache'
           },
-          timeout: CONFIG.AXIOS_TIMEOUT
+          timeout: CONFIG.AXIOS_TIMEOUT,
+          httpsAgent // Add the HTTPS agent here too
         });
         
         const $ = cheerio.load(initialResponse.data);
@@ -223,7 +258,8 @@ export class UAFScraper {
           },
           maxRedirects: 0,
           validateStatus: (status) => status === 302,
-          timeout: CONFIG.AXIOS_TIMEOUT
+          timeout: CONFIG.AXIOS_TIMEOUT,
+          httpsAgent // Add the HTTPS agent here too
         });
         
         const sessionCookies = sessionResponse.headers['set-cookie'];
@@ -243,7 +279,8 @@ export class UAFScraper {
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache'
           },
-          timeout: CONFIG.AXIOS_TIMEOUT
+          timeout: CONFIG.AXIOS_TIMEOUT,
+          httpsAgent // Add the HTTPS agent here too
         });
 
         const courses = this.parseAttendanceData(detailResponse.data);

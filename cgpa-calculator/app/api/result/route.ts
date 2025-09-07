@@ -13,6 +13,12 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  // Debug: Log incoming request and query params
+  console.debug('Incoming GET /api/result request', {
+    url: request.url,
+    searchParams: Object.fromEntries(request.nextUrl.searchParams.entries())
+  });
+
   const { isAllowed, corsHeaders } = corsMiddleware(request);
   
   if (!isAllowed) {
@@ -32,6 +38,7 @@ export async function GET(request: NextRequest) {
 
     // Validate API request hash
     const { isValid, error } = validateApiRequest(request, regNumber);
+    console.debug('API Request Validation', { isValid, error });
     if (!isValid) {
       return createCorsResponse({
         status: 'error',
@@ -48,6 +55,16 @@ export async function GET(request: NextRequest) {
     }
 
     const result = await scraper.getResult(regNumber);
+    console.log('Scraped Result:', result);
+    
+    // Check that the response structure is valid
+    if (!result.student_info || !result.result_table || !result.result_table.rows) {
+      console.error('Invalid result structure:', result);
+      return createCorsResponse({ 
+        status: 'error', 
+        message: 'Invalid result data structure' 
+      }, 500, corsHeaders);
+    }
     
     return createCorsResponse({
       status: 'success',
