@@ -82,17 +82,6 @@ export class UAFScraper {
 
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // Enhanced error handling for network issues
-        if (error.code === 'ECONNREFUSED') {
-          throw new Error(`Connection refused to the university server. The server may be down or blocking requests (${error.message}).`);
-        } else if (error.code === 'ENOTFOUND') {
-          throw new Error(`Could not connect to university server. Please check your internet connection or the server may be down (${error.message}).`);
-        } else if (error.timeout) {
-          throw new Error(`Connection timed out. The university server is not responding (${error.message}).`);
-        } else if (error.message.includes('certificate')) {
-          // Handle certificate errors specifically
-          throw new Error(`SSL Certificate error: Unable to establish secure connection to the university server. Using insecure mode for development.`);
-        }
 
         const statusCode = error.response?.status;
         const responseData = error.response?.data;
