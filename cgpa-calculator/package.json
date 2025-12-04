@@ -15,6 +15,7 @@
     "@headlessui/react": "^2.2.0",
     "@radix-ui/react-tabs": "^1.1.2",
     "@react-pdf/renderer": "^4.3.0",
+    "@sparticuz/chromium": "^141.0.0",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/node": "^20",
     "@types/react": "^19",

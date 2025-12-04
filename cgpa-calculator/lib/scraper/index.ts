@@ -9,6 +9,37 @@ const httpsAgent = new https.Agent({
   rejectUnauthorized: false // WARNING: This is not secure for production
 });
 
+// Helper to get Chromium executable for serverless environments
+async function getChromiumExecutable(): Promise<string | undefined> {
+  // In development/local, return undefined to use default Playwright browser
+  if (process.env.NODE_ENV === 'development' || !process.env.VERCEL) {
+    return undefined;
+  }
+  
+  // In Vercel/serverless, use @sparticuz/chromium
+  try {
+    const chromium = await import('@sparticuz/chromium');
+    return await chromium.default.executablePath();
+  } catch (e) {
+    console.error('Failed to load @sparticuz/chromium:', e);
+    return undefined;
+  }
+}
+
+// Helper to get Chromium args for serverless
+async function getChromiumArgs(): Promise<string[]> {
+  if (process.env.NODE_ENV === 'development' || !process.env.VERCEL) {
+    return [];
+  }
+  
+  try {
+    const chromium = await import('@sparticuz/chromium');
+    return chromium.default.args;
+  } catch (e) {
+    return [];
+  }
+}
+
 export class UAFScraper {
   private async submitFormAndGetResult(regNumber: string): Promise<string> {
     // Use Playwright to launch browser and submit the form.
@@ -24,10 +55,16 @@ export class UAFScraper {
       const loginUrl = CONFIG.LOGIN_URL;
       const resultUrl = CONFIG.RESULT_URL;
 
+      // Get executable path for serverless environments
+      const executablePath = await getChromiumExecutable();
+      const chromiumArgs = await getChromiumArgs();
+
       // Launch browser with longer timeout for slow sites
       browser = await chromium.launch({ 
         headless: true,
-        timeout: 60000
+        timeout: 60000,
+        executablePath: executablePath,
+        args: executablePath ? chromiumArgs : undefined
       });
       
       const context = await browser.newContext({
