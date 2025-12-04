@@ -2,99 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 @layer base {
   :root {
-    --background: hsl(0, 0%, 100%);
-    --foreground: hsl(222.2, 84%, 4.9%);
-    --primary: hsl(221, 83%, 53%);
-    --primary-foreground: hsl(210, 40%, 98%);
-    --font-poppins: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  }
-
-  .dark {
-    --background: hsl(222.2, 84%, 4.9%);
-    --foreground: hsl(210, 40%, 98%);
-    --primary: hsl(217, 91%, 60%);
-    --primary-foreground: hsl(222.2, 84%, 4.9%);
+    --background: #FFFFFF;
+    --foreground: #0c0a09;
+    --primary: #f97316; /* Orange 500 */
+    --primary-dark: #ea580c; /* Orange 600 */
+    --primary-darker: #c2410c; /* Orange 700 */
+    --secondary: #1c1917; /* Stone 900 */
+    --secondary-light: #292524; /* Stone 800 */
+    --text-primary: #0c0a09; /* Stone 950 */
+    --text-secondary: #57534e; /* Stone 600 */
+    --text-muted: #78716c; /* Stone 500 */
+    --bg-light: #fafaf9; /* Stone 50 */
+    --bg-subtle: #f5f5f4; /* Stone 100 */
+    --border-color: #e7e5e4; /* Stone 200 */
   }
 }
 
 @layer base {
   * {
-    font-family: var(--font-poppins);
+    font-family: 'Inter', system-ui, sans-serif;
   }
   
   body {
-    @apply bg-background text-foreground min-h-screen;
-    font-family: var(--font-poppins);
+    @apply bg-white text-stone-900 min-h-screen antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
   }
 }
 
 @layer components {
-  .glass-effect {
-    @apply backdrop-blur-lg bg-black/5 dark:bg-white/5 border border-white/10 shadow-lg;
+  .card-shadow {
+    @apply shadow-sm border border-stone-200;
   }
 
-  .gradient-text {
-    @apply bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent;
+  .card-shadow-hover {
+    @apply shadow-md border border-stone-200;
   }
 
-  .gradient-bg {
-    @apply bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700;
+  .btn-primary {
+    @apply bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-full px-6 py-3 transition-all duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-stone-900 hover:bg-stone-800 text-white font-semibold rounded-full px-6 py-3 transition-all duration-200;
+  }
+
+  .btn-outline {
+    @apply border-2 border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white font-semibold rounded-full px-6 py-3 transition-all duration-200;
   }
 
   .input-field {
-    @apply w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300 ease-in-out;
+    @apply w-full px-4 py-3 rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
   }
 
   .nav-link {
-    @apply relative px-3 py-2 transition-colors hover:text-foreground before:absolute before:left-0 before:-bottom-1 before:h-0.5 before:w-0 before:bg-foreground before:transition-all before:duration-300 hover:before:w-full;
+    @apply relative px-3 py-2 text-stone-600 transition-colors hover:text-primary-500 font-medium;
   }
 
-  .letter-spacing-wide {
-    letter-spacing: var(--input-letter-spacing, 0.5em);
+  .section-padding {
+    @apply py-16 md:py-24;
   }
 
-  input.letter-spacing-wide::placeholder {
-    letter-spacing: var(--input-letter-spacing, 0.5em);
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  .reg-number-input {
-    @apply bg-transparent border-0 focus:outline-none text-lg font-medium;
+  .card {
+    @apply bg-white rounded-2xl border border-stone-200 p-6;
   }
 
-  .reg-number-segment {
-    @apply px-2 py-2 bg-gray-100 dark:bg-gray-700/50 rounded-lg text-gray-400 
-           dark:text-gray-500 font-medium select-none transition-colors;
-  }
-}
-
-@keyframes float {
-  0% {
-    transform: translateY(0px);
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
   }
 
-  50% {
-    transform: translateY(-10px);
+  .badge-orange {
+    @apply bg-primary-100 text-primary-700;
   }
 
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+  .badge-dark {
+    @apply bg-stone-900 text-white;
   }
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(10px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -112,61 +109,54 @@
   }
 }
 
-@keyframes focusHighlight {
-  0% { background-color: rgba(59, 130, 246, 0); }
-  50% { background-color: rgba(59, 130, 246, 0.1); }
-  100% { background-color: rgba(59, 130, 246, 0); }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
-}
-
-.animate-spin-slow {
-  animation: spin 3s linear infinite;
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.5s ease-out;
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
 .animate-fadeInUp {
   animation: fadeInUp 0.5s ease-out;
 }
 
-.focus-highlight {
-  animation: focusHighlight 1s ease-in-out;
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+.animation-delay-100 {
+  animation-delay: 100ms;
 }
 
 .animation-delay-200 {
   animation-delay: 200ms;
 }
 
-.bg-gradient-text {
-  background-image: linear-gradient(
-    to right, 
-    #3b82f6, 
-    #8b5cf6, 
-    #ec4899, 
-    #8b5cf6, 
-    #3b82f6
-  );
-  background-size: 200% auto;
-  color: transparent;
-  -webkit-background-clip: text;
-  background-clip: text;
-  animation: gradientMove 5s linear infinite;
+.animation-delay-300 {
+  animation-delay: 300ms;
 }
 
-@keyframes gradientMove {
-  0% {
-    background-position: 0% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5f5f4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d6d3d1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e;
 }

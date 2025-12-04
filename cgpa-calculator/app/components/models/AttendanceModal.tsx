@@ -150,64 +150,64 @@ export const AttendanceModal = () => {
   if (!attendanceModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-2 sm:p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 sm:p-4 backdrop-blur-sm">
       <motion.div 
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] sm:max-h-[80vh] overflow-hidden border dark:border-gray-700"
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] sm:max-h-[80vh] overflow-hidden border border-stone-200"
       >
-        <div className="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">
+        <div className="p-5 border-b border-stone-200 flex justify-between items-center bg-stone-50">
+          <h2 className="text-lg sm:text-xl font-bold text-stone-900">
             Import Attendance System Data
           </h2>
           <button 
             onClick={closeAttendanceModal}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="w-8 h-8 rounded-lg bg-stone-200 hover:bg-stone-300 flex items-center justify-center transition-colors"
             aria-label="Close modal"
           >
-            <X className="w-5 h-5 sm:w-6 sm:h-6" />
+            <X className="w-4 h-4 text-stone-600" />
           </button>
         </div>
         
-        <div className="p-4 sm:p-5 overflow-auto max-h-[calc(90vh-130px)] sm:max-h-[calc(80vh-140px)]">
+        <div className="p-5 overflow-auto max-h-[calc(90vh-130px)] sm:max-h-[calc(80vh-140px)]">
           {loading ? (
-            <div className="flex flex-col items-center justify-center h-40 sm:h-48">
-              <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 animate-spin text-blue-500" />
-              <span className="mt-3 text-sm sm:text-base text-gray-600 dark:text-gray-300">Loading attendance data...</span>
+            <div className="flex flex-col items-center justify-center h-48">
+              <Loader2 className="w-10 h-10 animate-spin text-primary-500" />
+              <span className="mt-3 text-stone-500">Loading attendance data...</span>
             </div>
           ) : error ? (
-            <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-center p-4 rounded-lg text-sm sm:text-base border border-red-200 dark:border-red-800">
+            <div className="bg-red-50 text-red-600 text-center p-4 rounded-xl text-sm border border-red-200">
               {error}
             </div>
           ) : attendanceData.length === 0 ? (
-            <div className="bg-gray-50 dark:bg-gray-700/30 text-gray-600 dark:text-gray-300 text-center p-4 rounded-lg text-sm sm:text-base border border-gray-200 dark:border-gray-700">
+            <div className="bg-stone-50 text-stone-500 text-center p-4 rounded-xl text-sm border border-stone-200">
               No attendance data found.
             </div>
           ) : (
             <>
-              <div className="mb-4 sm:mb-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+              <div className="mb-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                  <p className="text-sm text-stone-700 font-medium">
                     {showAllCourses 
                       ? `Showing all courses (${attendanceData.length})` 
                       : `Showing new courses (${newCoursesCount})`}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-xs text-stone-500 mt-1">
                     Select courses to add to your calculation
                   </p>
                 </div>
                 <button
                   onClick={() => setShowAllCourses(!showAllCourses)}
-                  className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center"
+                  className="px-4 py-2 text-sm bg-stone-100 text-stone-700 rounded-full hover:bg-stone-200 transition-colors font-medium"
                 >
                   {showAllCourses ? 'Show New Only' : 'Show All Courses'}
                 </button>
               </div>
               
               {displayedCourses.length === 0 ? (
-                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 text-center">
-                  <p className="text-amber-700 dark:text-amber-400 text-sm">
+                <div className="bg-primary-50 border border-primary-200 rounded-xl p-4 text-center">
+                  <p className="text-primary-700 text-sm">
                     No new courses found. Click 'Show All Courses' to see all courses.
                   </p>
                 </div>
@@ -216,57 +216,57 @@ export const AttendanceModal = () => {
                   {displayedCourses.map((course, index) => (
                     <div 
                       key={index} 
-                      className={`p-3 sm:p-4 border rounded-lg flex flex-col sm:flex-row sm:items-center justify-between transition-colors ${
+                      className={`p-4 border rounded-xl flex flex-col sm:flex-row sm:items-center justify-between transition-all cursor-pointer ${
                         selectedCourses[course.course_code] 
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-sm' 
-                          : 'border-gray-200 dark:border-gray-700'
-                      } ${existingCourseCodes.includes(course.course_code) ? 'border-l-4 border-l-amber-500' : ''}`}
+                          ? 'border-primary-300 bg-primary-50' 
+                          : 'border-stone-200 hover:border-stone-300'
+                      } ${existingCourseCodes.includes(course.course_code) ? 'border-l-4 border-l-primary-500' : ''}`}
                       onClick={() => handleToggleCourse(course.course_code)}
                     >
-                      <div className="flex-grow mr-2 mb-3 sm:mb-0 cursor-pointer">
+                      <div className="flex-grow mr-2 mb-3 sm:mb-0">
                         <div className="flex items-center">
                           <div
-                            className="mr-2 text-blue-600 dark:text-blue-400 flex-shrink-0"
+                            className="mr-3 flex-shrink-0"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleToggleCourse(course.course_code);
                             }}
                           >
                             {selectedCourses[course.course_code] ? (
-                              <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+                              <CheckCircle className="w-5 h-5 text-primary-500" />
                             ) : (
-                              <Circle className="w-5 h-5 sm:w-6 sm:h-6" />
+                              <Circle className="w-5 h-5 text-stone-400" />
                             )}
                           </div>
                           <div className="flex-grow">
-                            <div className="font-medium text-gray-900 dark:text-gray-100 text-sm sm:text-base">
+                            <div className="font-medium text-stone-900 text-sm">
                               {course.course_code} - {course.course_title || 'Unknown Course'}
                               {existingCourseCodes.includes(course.course_code) && (
-                                <span className="ml-2 px-2 py-0.5 text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 rounded">
+                                <span className="ml-2 px-2 py-0.5 text-xs bg-primary-100 text-primary-700 rounded-full font-medium">
                                   Already Added
                                 </span>
                               )}
                             </div>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 mt-1.5">
-                              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                                <span className="font-medium">Semester:</span> {course.semester}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 mt-2">
+                              <div className="text-xs text-stone-500">
+                                <span className="font-medium text-stone-600">Semester:</span> {course.semester}
                               </div>
-                              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                                <span className="font-medium">Grade:</span> {course.grade || 'N/A'}
+                              <div className="text-xs text-stone-500">
+                                <span className="font-medium text-stone-600">Grade:</span> {course.grade || 'N/A'}
                               </div>
-                              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                                <span className="font-medium">Total:</span> {course.total || 'N/A'}
+                              <div className="text-xs text-stone-500">
+                                <span className="font-medium text-stone-600">Total:</span> {course.total || 'N/A'}
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
                       
-                      <div className="relative sm:ml-2 " onClick={(e) => e.stopPropagation()}>
+                      <div className="relative sm:ml-2" onClick={(e) => e.stopPropagation()}>
                         <select
                           value={creditHours[course.course_code] || "3"}
                           onChange={(e) => handleCreditHoursChange(course.course_code, e.target.value)}
-                          className="pl-3 pr-8 py-1.5 text-sm  border dark:bg-gray-700 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="pl-3 pr-8 py-2 text-sm bg-white border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                           aria-label="Set credit hours"
                         >
                           {[1, 2, 3, 4, 5, 6].map((hours) => (
@@ -282,17 +282,17 @@ export const AttendanceModal = () => {
           )}
         </div>
         
-        <div className="p-4 sm:p-5 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
+        <div className="p-5 border-t border-stone-200 flex justify-end gap-3 bg-stone-50">
           <button
             onClick={closeAttendanceModal}
-            className="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 dark:text-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
+            className="px-5 py-2.5 text-sm text-stone-700 bg-white border border-stone-200 rounded-full hover:bg-stone-100 transition-colors font-medium"
           >
             Cancel
           </button>
           <button
             onClick={handleAddSelectedCourses}
             disabled={loading || displayedCourses.length === 0 || !Object.values(selectedCourses).some(selected => selected)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center text-sm transition-colors"
+            className="px-5 py-2.5 bg-primary-500 text-white rounded-full hover:bg-primary-600 disabled:bg-primary-300 disabled:cursor-not-allowed flex items-center text-sm transition-colors font-medium"
           >
             <Plus className="w-4 h-4 mr-1.5" />
             Add Selected Courses

@@ -3,7 +3,7 @@ import { Home } from 'lucide-react';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       <div className="h-screen flex flex-col items-center justify-center px-4">
         <div className="text-center space-y-6">
           <h1 className="text-6xl font-bold text-gray-900 dark:text-gray-100">404</h1>
@@ -13,7 +13,7 @@ export default function NotFound() {
           </p>
           <Link 
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 
+            className="inline-flex items-center gap-2 px-6 py-3 bg-brand hover:bg-brand/90 
                      text-white rounded-lg transition-colors duration-200 shadow-lg"
           >
             <Home className="w-5 h-5" />

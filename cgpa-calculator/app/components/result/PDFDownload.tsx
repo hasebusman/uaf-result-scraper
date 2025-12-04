@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: 700,
-    color: '#1E3A8A',
+    color: '#0BA6DF',
   },
   subtitle: {
     fontSize: 9,
@@ -101,13 +101,13 @@ const styles = StyleSheet.create({
   cgpaValue: {
     fontSize: 16,
     fontWeight: 700,
-    color: '#1E3A8A',
+    color: '#0BA6DF',
   },
   sectionTitle: {
     fontSize: 11,
     fontWeight: 500,
     color: '#FFFFFF',
-    backgroundColor: '#1E3A8A',
+    backgroundColor: '#0BA6DF',
     padding: 4,
     marginVertical: 8,
   },
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   summaryText: {
     fontSize: 9,
     fontWeight: 700,
-    color: '#1E3A8A',
+    color: '#0BA6DF',
   },
   footer: {
     position: 'absolute',

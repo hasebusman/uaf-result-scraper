@@ -72,66 +72,69 @@ export const AddCourseModal = ({ isOpen, onClose, semester, onAddCourse }: AddCo
 
   return (
     <Dialog open={isOpen} onClose={handleClose} className="relative z-50">
-      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="mx-auto max-w-lg w-full rounded-xl bg-white dark:bg-gray-800 p-6 shadow-xl">
-          <div className="flex justify-between items-center mb-4">
-            <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <Dialog.Panel className="mx-auto max-w-lg w-full rounded-2xl bg-white p-6 shadow-xl border border-stone-200">
+          <div className="flex justify-between items-center mb-6">
+            <Dialog.Title className="text-lg font-bold text-stone-900">
               Add New Course
             </Dialog.Title>
-            <button onClick={handleClose} className="text-gray-500 hover:text-gray-700">
-              <X className="w-5 h-5" />
+            <button 
+              onClick={handleClose} 
+              className="w-8 h-8 rounded-lg bg-stone-100 hover:bg-stone-200 flex items-center justify-center transition-colors"
+            >
+              <X className="w-4 h-4 text-stone-600" />
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-xs font-medium text-stone-500 uppercase tracking-wider mb-2">
                   Course Code
                 </label>
                 <input
                   type="text"
                   required
                   placeholder="e.g., CS-101"
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2 text-sm"
+                  className="w-full rounded-xl border border-stone-200 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   value={courseData.courseCode}
                   onChange={(e) => setCourseData(prev => ({ ...prev, courseCode: e.target.value }))}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-xs font-medium text-stone-500 uppercase tracking-wider mb-2">
                   Credit Hours
                 </label>
                 <select
                   required
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2 text-sm"
+                  className="w-full rounded-xl border border-stone-200 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-white"
                   value={courseData.creditHours}
                   onChange={(e) => setCourseData(prev => ({ ...prev, creditHours: e.target.value }))}
                 >
-                  <option value="">Select Credit Hours</option>
+                  <option value="">Select Hours</option>
                   {[1, 2, 3, 4, 5, 6].map(hours => (
                     <option key={hours} value={hours}>{hours}</option>
                   ))}
                 </select>
               </div>
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Course Title <span className="text-gray-400">(Optional)</span>
+                <label className="block text-xs font-medium text-stone-500 uppercase tracking-wider mb-2">
+                  Course Title <span className="text-stone-400 normal-case">(Optional)</span>
                 </label>
                 <input
                   type="text"
                   placeholder="e.g., Introduction to Computer Science"
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2 text-sm"
+                  className="w-full rounded-xl border border-stone-200 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   value={courseData.courseTitle}
                   onChange={(e) => setCourseData(prev => ({ ...prev, courseTitle: e.target.value }))}
                 />
               </div>
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-xs font-medium text-stone-500 uppercase tracking-wider mb-2">
                   Obtained Marks
                   {courseData.creditHours && (
-                    <span className="text-gray-400 ml-1">
+                    <span className="text-stone-400 ml-1 normal-case">
                       (out of {parseInt(courseData.creditHours) * 20})
                     </span>
                   )}
@@ -142,24 +145,24 @@ export const AddCourseModal = ({ isOpen, onClose, semester, onAddCourse }: AddCo
                   min="0"
                   max={courseData.creditHours ? parseInt(courseData.creditHours) * 20 : undefined}
                   step="0.1"
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 p-2 text-sm"
+                  className="w-full rounded-xl border border-stone-200 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   value={courseData.obtainedMarks}
                   onChange={(e) => setCourseData(prev => ({ ...prev, obtainedMarks: e.target.value }))}
                 />
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 mt-6">
+            <div className="flex justify-end gap-3 pt-4">
               <button
                 type="button"
                 onClick={handleClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                className="px-5 py-2.5 text-sm font-medium text-stone-700 bg-white border border-stone-200 rounded-full hover:bg-stone-100 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                className="px-5 py-2.5 text-sm font-medium text-white bg-primary-500 rounded-full hover:bg-primary-600 transition-colors"
               >
                 Add Course
               </button>

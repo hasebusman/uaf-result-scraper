@@ -1,16 +1,15 @@
-import { Poppins } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "./components/ui/Navbar";
-import { ClientLayout } from './components/layout/ClientLayout';
 import { Metadata } from 'next'
 import { keywords } from './utils/keywords'
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
-const poppins = Poppins({
+const roboto = Roboto({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "700", "900"],
   display: 'swap',
-  variable: '--font-poppins',
+  variable: '--font-roboto',
   preload: true,
 });
 
@@ -74,8 +73,6 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  
-
 }
 
 export default function RootLayout({
@@ -84,20 +81,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body className={`${poppins.className} ${poppins.variable}`} suppressHydrationWarning>
-        <ClientLayout>
-          <div className="relative flex min-h-screen flex-col">
-            <Navbar />
-            {children}
-          </div>
-          <SpeedInsights/>
-        </ClientLayout>
-
+      <body className={`${roboto.className} ${roboto.variable}`}>
+        <div className="relative flex min-h-screen flex-col bg-white">
+          <Navbar />
+          {children}
+        </div>
+        <SpeedInsights/>
       </body>
     </html>
   );

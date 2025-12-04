@@ -5,8 +5,8 @@ import { Shield, BookOpen, Lock, Mail, Globe } from 'lucide-react'
 const PolicySection = ({ icon: Icon, title, children }: { icon: any, title: string, children: React.ReactNode }) => (
   <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 animate-fadeIn">
     <div className="flex items-center gap-4 mb-4">
-      <div className="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-full">
-        <Icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+      <div className="p-3 bg-brand/10 dark:bg-brand/20 rounded-full">
+        <Icon className="w-6 h-6 text-brand dark:text-brand" />
       </div> 
       <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{title}</h2>
     </div>
@@ -18,7 +18,7 @@ const PolicySection = ({ icon: Icon, title, children }: { icon: any, title: stri
 
 export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 animate-fadeIn">
+    <div className="min-h-screen bg-white dark:bg-gray-900 animate-fadeIn">
       <div className="max-w-4xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
         <div className="text-center mb-12 animate-fadeInUp">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">Privacy Policy</h1>
@@ -32,7 +32,7 @@ export default function PrivacyPolicy() {
               <li>Automated retrieval and processing of your academic data</li>
               <li>Temporary access to your academic information for CGPA calculation</li>
             </ul>
-            <p className="mt-4 text-sm bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+            <p className="mt-4 text-sm bg-brand/5 dark:bg-brand/10 p-4 rounded-lg">
               Note: This process is automated and secure. We only access publicly available academic records
               using your provided registration number, similar to how you would view them on the UAF portal.
             </p>
@@ -68,7 +68,7 @@ export default function PrivacyPolicy() {
             <div className="mt-2">
               <a
                 href="mailto:support@uafcalculator.live"
-                className="text-blue-600 dark:text-blue-400 hover:underline"
+                className="text-brand dark:text-brand hover:underline"
               >
                 support@uafcalculator.live
               </a>

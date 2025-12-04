@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
-import { BookOpen, Users } from 'lucide-react'
+import { GraduationCap, Users, TrendingUp } from 'lucide-react'
 import { SemesterCard } from './SemesterCard'
-import { groupBySemester, calculateSemesterCGPA, calculateOverallCGPA, cgpaToPercentage } from '../../utils/calculations'
+import { groupBySemester, calculateOverallCGPA, cgpaToPercentage } from '../../utils/calculations'
 import { useEffect, useState } from 'react'
 import { AttendanceModal } from '../models/AttendanceModal'
 import { useResultStore } from '../../store/useResultStore'
@@ -34,58 +34,91 @@ export const ResultDisplay = ({ windowWidth }: ResultDisplayProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
-        className="space-y-6 min-h-[300px]"
+        className="space-y-8"
       >
-        <div className="flex justify-between mb-6 h-[40px]">
+        {/* Action Buttons */}
+        <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
           <button
             onClick={openAttendanceModal}
             aria-label="Check attendance system"
-            className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 h-10 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-stone-900 text-white rounded-full hover:bg-stone-800 transition-all duration-200 text-sm font-medium"
           >
-            <Users className="w-4 h-4" /> Attendance System Result
+            <Users className="w-4 h-4" />
+            <span>Attendance System</span>
           </button>
-
-          {/* PDF download button */}
           <PDFDownloadButton result={result} includedCourses={includedCourses} />
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700 min-h-[150px]" id="result-card">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-full">
-                <BookOpen className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+        {/* Student Info Card */}
+        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden" id="result-card">
+          <div className="bg-stone-900 px-6 py-8 text-white">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-primary-500 flex items-center justify-center">
+                  <GraduationCap className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl md:text-2xl font-bold">
+                    {result.student_info.student_full_name}
+                  </h2>
+                  <p className="text-stone-400 text-sm mt-1">
+                    {result.student_info.registration_}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                  {result.student_info.student_full_name}
-                </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {result.student_info.registration_}
-                </p>
+              
+              <div className="flex items-center gap-6">
+                <div className="text-center md:text-right">
+                  <div className="flex items-center gap-2 text-primary-400 mb-1">
+                    <TrendingUp className="w-4 h-4" />
+                    <span className="text-sm font-medium">Cumulative GPA</span>
+                  </div>
+                  <p className="text-4xl md:text-5xl font-bold">
+                    {overallCGPA.toFixed(2)}
+                  </p>
+                  <p className="text-stone-400 text-sm mt-1">
+                    {cgpaToPercentage(overallCGPA)}% Overall
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total CGPA</p>
-              <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                {overallCGPA.toFixed(4)}
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {cgpaToPercentage(overallCGPA)}%
-              </p>
+          </div>
+          
+          {/* Stats Bar */}
+          <div className="px-6 py-4 bg-stone-50 border-t border-stone-200">
+            <div className="flex flex-wrap gap-6">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-primary-500"></div>
+                <span className="text-sm text-stone-600">
+                  <strong className="text-stone-900">{semesters.length}</strong> Semesters
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                <span className="text-sm text-stone-600">
+                  <strong className="text-stone-900">{includedCourses.length}</strong> Courses
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[200px]">
-          {semesters.map((semester) => (
-            <SemesterCard
+        {/* Semester Cards Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {semesters.map((semester, index) => (
+            <motion.div
               key={semester}
-              semester={semester}
-              isMobile={windowWidth < 1024}
-            />
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+            >
+              <SemesterCard
+                semester={semester}
+                isMobile={windowWidth < 1024}
+              />
+            </motion.div>
           ))}
         </div>
-
       </motion.div>
       <AttendanceModal />
     </>

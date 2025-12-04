@@ -6,11 +6,6 @@ interface LoadingSpinnerProps {
 }
 
 export const LoadingSpinner = ({ progress }: LoadingSpinnerProps) => {
-  const iconVariants = {
-    initial: { scale: 0.5, opacity: 0 },
-    animate: { scale: 1, opacity: 1 }
-  };
-
   const messages = [
     "Fetching your academic records...",
     "Calculating your grades...",
@@ -25,59 +20,44 @@ export const LoadingSpinner = ({ progress }: LoadingSpinnerProps) => {
       aria-label="Loading progress"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-xl w-full max-w-lg mx-auto mb-8"
+      className="bg-white rounded-2xl p-8 border border-stone-200 w-full max-w-lg mx-auto"
     >
       <div className="space-y-6">
         {/* Animated Icons */}
         <div className="flex justify-center gap-8">
-          {[GraduationCap, Book, Calculator].map((Icon, index) => (
+          {[
+            { Icon: GraduationCap, delay: 0 },
+            { Icon: Book, delay: 0.2 },
+            { Icon: Calculator, delay: 0.4 }
+          ].map(({ Icon, delay }, index) => (
             <motion.div
               key={index}
-              variants={iconVariants}
-              initial="initial"
-              animate="animate"
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
               transition={{
-                delay: index * 0.2,
+                delay,
                 duration: 0.5,
                 repeat: Infinity,
                 repeatType: "reverse",
                 repeatDelay: 1
               }}
+              className="w-12 h-12 rounded-xl bg-stone-100 flex items-center justify-center"
             >
-              <Icon className="w-8 h-8 text-blue-500 dark:text-blue-400" />
+              <Icon className="w-6 h-6 text-stone-600" />
             </motion.div>
           ))}
         </div>
 
         {/* Progress Bar */}
         <div className="relative">
-          <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
             <motion.div
-              className="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-500 to-purple-500"
+              className="h-full bg-primary-500 rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.3 }}
             />
           </div>
-          {/* Animated Pulse Dot */}
-          <motion.div
-            className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-blue-500 rounded-full"
-            initial={{ left: "0%" }}
-            animate={{ left: `${progress}%` }}
-            transition={{ duration: 0.3 }}
-          >
-            <motion.div
-              className="absolute inset-0 bg-blue-500 rounded-full"
-              animate={{
-                scale: [1, 1.5, 1],
-                opacity: [0.5, 0, 0.5]
-              }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity
-              }}
-            />
-          </motion.div>
         </div>
 
         {/* Status Message */}
@@ -86,11 +66,11 @@ export const LoadingSpinner = ({ progress }: LoadingSpinnerProps) => {
             key={currentMessage}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-sm text-gray-600 dark:text-gray-300 text-center"
+            className="text-sm text-stone-500 text-center"
           >
             {currentMessage}
           </motion.p>
-          <span className="text-lg font-semibold text-blue-600 dark:text-blue-400">
+          <span className="text-2xl font-bold text-stone-900">
             {Math.round(progress)}%
           </span>
         </div>

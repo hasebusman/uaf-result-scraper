@@ -42,9 +42,9 @@ export function PDFDownloadButton({ result, includedCourses }: PDFDownloadButton
       <button
         disabled
         aria-label="Download failed"
-        className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 h-10 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm sm:text-base"
+        className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-500 text-white rounded-full text-sm font-medium"
       >
-        <span className="inline-block min-w-[auto] sm:min-w-[80px]">Error</span>
+        <span>Error</span>
       </button>
     );
   }
@@ -54,16 +54,14 @@ export function PDFDownloadButton({ result, includedCourses }: PDFDownloadButton
       onClick={handleDownload}
       disabled={isLoading}
       aria-label="Download result as PDF"
-      className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 h-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed text-sm sm:text-base"
+      className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-all duration-200 disabled:bg-primary-300 disabled:cursor-not-allowed text-sm font-medium"
     >
       {isLoading ? (
         <Loader2 className="w-4 h-4 animate-spin" />
       ) : (
         <Download className="w-4 h-4" />
       )}
-      <span className="inline-block min-w-[auto] sm:min-w-[80px]">
-        {isLoading ? 'Preparing...' : 'Download'}
-      </span>
+      <span>{isLoading ? 'Preparing...' : 'Download PDF'}</span>
     </button>
   );
 }

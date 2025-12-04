@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { scraper } from '@/lib/scraper';
 import { corsMiddleware, createCorsResponse, createCorsErrorResponse, validateApiRequest } from '@/lib/cors';
 
+// Force Node.js runtime (required for Playwright)
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function OPTIONS(request: NextRequest) {
   const { isAllowed, corsHeaders } = corsMiddleware(request);
   

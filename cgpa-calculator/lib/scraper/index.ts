@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { CONFIG } from './config';
+import { CONFIG, SELECTORS } from './config';
 import type { CourseRow, ResultData } from '../../app/types';
 import https from 'https'; 
 
@@ -11,81 +11,153 @@ const httpsAgent = new https.Agent({
 
 export class UAFScraper {
   private async submitFormAndGetResult(regNumber: string): Promise<string> {
+    // Use Playwright to launch browser and submit the form.
+    // This helps when the target site has issues with direct HTTP requests.
+    let browser;
     try {
-      // Log connection attempt for debugging
-      console.debug(`Attempting to connect to ${CONFIG.LOGIN_URL} for registration number ${regNumber}`);
+      console.debug(`Launching browser to fetch result for ${regNumber}`);
+
+      // Use playwright-core for better bundler compatibility
+      const { chromium } = await import('playwright-core');
+
+      // Use HTTP URLs as defined in config (the site may not support HTTPS properly)
+      const loginUrl = CONFIG.LOGIN_URL;
+      const resultUrl = CONFIG.RESULT_URL;
+
+      // Launch browser with longer timeout for slow sites
+      browser = await chromium.launch({ 
+        headless: true,
+        timeout: 60000
+      });
       
-      // Make sure URLs use HTTPS not HTTP
-      const loginUrl = CONFIG.LOGIN_URL.replace('http://', 'https://');
-      const resultUrl = CONFIG.RESULT_URL.replace('http://', 'https://');
-      
-      const loginPageResponse = await axios.get(loginUrl, {
-        headers: {
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36',
+      const context = await browser.newContext({
+        // Use Edge user agent to mimic Edge browser
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0',
+        ignoreHTTPSErrors: true,
+        // Add extra HTTP headers
+        extraHTTPHeaders: {
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.9',
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
-        },
-        httpsAgent // Use the custom HTTPS agent to ignore certificate issues
+        }
       });
 
-      const cookies = loginPageResponse.headers['set-cookie'];
-      const cookieHeader = cookies ? cookies.map(c => c.split(';')[0]).join('; ') : '';
-
-      const tokenMatch = loginPageResponse.data.match(/document\.getElementById\(['"]token['"]\)\.value\s*=\s*['"]([^'"]+)['"]/);
-      const token = tokenMatch ? tokenMatch[1] : '';
+      const page = await context.newPage();
       
-      if (!token) {
-        throw new Error('Failed to extract authentication token');
-      }
+      // Set longer default timeout for slow server
+      page.setDefaultTimeout(60000);
+      page.setDefaultNavigationTimeout(60000);
 
-      const formData = new URLSearchParams();
-      formData.append('Register', regNumber);
-      formData.append('token', token);
-
-      console.debug(`Submitting form to ${resultUrl} with token extracted`);
-
-      const resultResponse = await axios.post(resultUrl, formData, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-          'Origin': loginUrl.substring(0, loginUrl.lastIndexOf('/')),
-          'Referer': loginUrl,
-          'Cookie': cookieHeader,
-          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36',
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache',
-          'Upgrade-Insecure-Requests': '1'
-        },
-        maxRedirects: 5,
-        validateStatus: null, 
-        timeout: CONFIG.AXIOS_TIMEOUT,
-        withCredentials: true,
-        httpsAgent // Use the custom HTTPS agent here too
+      console.debug(`Navigating to ${loginUrl}`);
+      
+      // Go to login page - use longer timeout
+      const resp = await page.goto(loginUrl, { 
+        waitUntil: 'networkidle', 
+        timeout: 60000 
       });
+      
+      if (!resp) {
+        throw new Error('No response received from login page');
+      }
+      
+      console.debug(`Login page loaded with status: ${resp.status()}`);
 
-      if (resultResponse.status !== 200) {
-        throw new Error(`Server responded with status code ${resultResponse.status}`);
+      // Wait for the page to be ready
+      await page.waitForLoadState('domcontentloaded');
+      
+      // Try to find and extract token if present (some sites use JS to set token)
+      const token = await page.evaluate(() => {
+        const tokenInput = document.querySelector('input[name="token"], input#token') as HTMLInputElement;
+        return tokenInput?.value || '';
+      });
+      
+      console.debug(`Token found: ${token ? 'yes' : 'no'}`);
+
+      // Try multiple selectors for the registration input
+      const regInputSelectors = [
+        SELECTORS.REG_INPUT,
+        "input[name='Register']",
+        "input#REG",
+        "input[name*='Register']"
+      ];
+      
+      let filled = false;
+      for (const selector of regInputSelectors) {
+        try {
+          const input = await page.$(selector);
+          if (input) {
+            await input.fill(regNumber);
+            console.debug(`Filled registration number using selector: ${selector}`);
+            filled = true;
+            break;
+          }
+        } catch (e) {
+          // Try next selector
+        }
+      }
+      
+      if (!filled) {
+        throw new Error('Could not find registration input field');
       }
 
-      const html = resultResponse.data;
+      // Find and click submit button
+      const submitSelectors = [
+        SELECTORS.SUBMIT_BUTTON,
+        "input[type='submit'][value='Result']",
+        "input[type='submit']",
+        "button[type='submit']"
+      ];
+      
+      let submitted = false;
+      for (const selector of submitSelectors) {
+        try {
+          const btn = await page.$(selector);
+          if (btn) {
+            console.debug(`Clicking submit button: ${selector}`);
+            await Promise.all([
+              page.waitForNavigation({ waitUntil: 'networkidle', timeout: 60000 }).catch(() => {}),
+              btn.click()
+            ]);
+            submitted = true;
+            break;
+          }
+        } catch (e) {
+          // Try next selector
+        }
+      }
+      
+      if (!submitted) {
+        // Try submitting by pressing Enter
+        console.debug('No submit button found, trying Enter key');
+        await page.keyboard.press('Enter');
+        await page.waitForLoadState('networkidle').catch(() => {});
+      }
 
-      if (typeof html !== 'string' || html.length < 100) {
-        throw new Error('HTML response received');
+      // Wait for result to load
+      await page.waitForTimeout(2000);
+
+      const html = await page.content();
+      console.debug(`Got HTML response, length: ${html.length}`);
+
+      await browser.close();
+      browser = null;
+
+      if (typeof html !== 'string' || html.length < CONFIG.VALIDATION.MIN_HTML_LENGTH) {
+        throw new Error('HTML response appears invalid or too short');
       }
 
       if (!html.includes('table class="table tab-content"')) {
+        // Log part of HTML for debugging
+        console.debug('HTML snippet:', html.substring(0, 500));
         throw new Error('Response missing result table');
       }
 
       return html;
-
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-
-        const statusCode = error.response?.status;
-        const responseData = error.response?.data;
-        throw new Error(`Network error (${statusCode || 'connection error'}): ${responseData || error.message}`);
+      // Make sure browser is closed on error
+      if (browser) {
+        await browser.close().catch(() => {});
       }
       throw error;
     }

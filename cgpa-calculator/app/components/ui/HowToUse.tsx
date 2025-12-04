@@ -1,75 +1,108 @@
-import { Search, Calculator, School, CheckCircle2, GraduationCap, Users } from 'lucide-react'
+'use client'
+
+import { Search, Calculator, BarChart3, Users, Settings } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 export const HowToUse = () => {
   const steps = [
     {
       icon: Search,
+      number: "01",
       title: "Enter Registration",
       description: "Input your UAF registration number (e.g., 2022-ag-7693) to access your academic records from UAF's database"
     },
     {
       icon: Calculator,
+      number: "02",
       title: "Calculate CGPA",
       description: "Click calculate to instantly process your UAF semester grades and credit hours according to university standards"
     },
     {
-      icon: School,
+      icon: BarChart3,
+      number: "03",
       title: "View Results",
       description: "See detailed semester-wise GPA breakdown and overall UAF CGPA calculation with percentage conversion"
     },
     {
       icon: Users,
-      title: "Add Attendance System Results",
-      description: "Access courses that UAF teachers uploaded to the Attendance System by clicking 'Attendance System Result' and importing missing courses to your calculation"
+      number: "04",
+      title: "Import Attendance Data",
+      description: "Access courses that UAF teachers uploaded to the Attendance System and import missing courses to your calculation"
     },
     {
-      icon: CheckCircle2,
+      icon: Settings,
+      number: "05",
       title: "Customize Results",
-      description: "Exclude specific courses, add manual entries, or combine LMS and Attendance System data to analyze different UAF CGPA scenarios"
+      description: "Exclude specific courses, add manual entries, or combine LMS and Attendance System data to analyze different CGPA scenarios"
     }
   ];
 
   return (
-    <section className="mb-24 mt-12 px-4">
-      <div className="max-w-6xl mx-auto rounded-3xl bg-white/70 dark:bg-gray-800/50 backdrop-blur-sm shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden relative">
-        <div className="absolute top-0 left-0 w-64 h-64 bg-blue-100/50 dark:bg-blue-900/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
-        <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-100/50 dark:bg-purple-900/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none"></div>
-        
-        <div className="py-16 px-6 md:px-12 relative z-10">
-          <div className="text-center mb-16">
-            <div className="inline-block p-4 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-2xl shadow-md mb-5">
-              <GraduationCap className="w-14 h-14 text-blue-600 dark:text-blue-400" />
-            </div>
-            <h2 className="text-4xl font-bold mb-5 text-gray-900 dark:text-gray-100 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-400 dark:to-indigo-400">
-              How to Use UAF Grade Calculator
-            </h2>
-            <p className="text-gray-700 dark:text-gray-300 max-w-2xl mx-auto text-lg">
-              Calculate your University of Agriculture Faisalabad (UAF) CGPA instantly with our CGPA Calculator.
-              Designed specifically for UAF students following the university's official grading criteria.
-            </p>
-          </div>
+    <section className="py-20 bg-stone-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="inline-flex items-center gap-2 bg-primary-100 text-primary-700 px-4 py-2 rounded-full mb-6"
+          >
+            <span className="text-sm font-medium">Simple Process</span>
+          </motion.div>
+          
+          <motion.h2 
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="text-3xl md:text-4xl font-bold text-stone-900 mb-4"
+          >
+            How to Calculate Your CGPA
+          </motion.h2>
+          
+          <motion.p 
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="text-lg text-stone-500 max-w-2xl mx-auto"
+          >
+            Calculate your University of Agriculture Faisalabad (UAF) CGPA instantly with our calculator designed for UAF students.
+          </motion.p>
+        </div>
 
-          <div className="space-y-20 md:space-y-28">
-            {steps.map((step, index) => (
-              <div 
-                key={index} 
-                className={`flex flex-col ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-10 md:gap-16 group`}
-              >
-                <div className="w-full md:w-1/3 flex justify-center">
-                  <div className="w-28 h-28 sm:w-36 sm:h-36 bg-gradient-to-br from-blue-500 to-indigo-600 dark:from-blue-600 dark:to-indigo-800 rounded-2xl shadow-lg flex items-center justify-center transform rotate-3 group-hover:rotate-0 group-hover:scale-105 transition-all duration-500">
-                    <step.icon className="w-14 h-14 sm:w-18 sm:h-18 text-white" />
-                  </div>
-                </div>
-                
-                <div className="w-full md:w-2/3 text-center md:text-left">
-                  <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">{step.title}</h3>
-                  <p className="text-gray-700 dark:text-gray-300 text-lg">{step.description}</p>
-                  
-                  <div className="mt-5 w-20 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 mx-auto md:ml-0 rounded-full group-hover:w-28 transition-all duration-300"></div>
+        {/* Steps Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {steps.map((step, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+              className="bg-white rounded-2xl border border-stone-200 p-6 hover:border-primary-200 hover:shadow-lg hover:shadow-primary-100/50 transition-all duration-300 group"
+            >
+              {/* Step Number */}
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-4xl font-bold text-stone-200 group-hover:text-primary-200 transition-colors">
+                  {step.number}
+                </span>
+                <div className="w-12 h-12 rounded-xl bg-stone-100 group-hover:bg-primary-100 flex items-center justify-center transition-colors">
+                  <step.icon className="w-6 h-6 text-stone-600 group-hover:text-primary-600 transition-colors" />
                 </div>
               </div>
-            ))}
-          </div>
+              
+              {/* Content */}
+              <h3 className="text-xl font-bold text-stone-900 mb-2 group-hover:text-primary-600 transition-colors">
+                {step.title}
+              </h3>
+              <p className="text-stone-500 text-sm leading-relaxed">
+                {step.description}
+              </p>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

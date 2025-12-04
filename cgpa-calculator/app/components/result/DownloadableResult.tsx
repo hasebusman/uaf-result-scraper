@@ -125,7 +125,7 @@ export const DownloadableResult = ({ result, includedCourses }: DownloadableResu
           target="_blank" 
           rel="noopener noreferrer"
           style={{ 
-            color: '#2563eb',
+            color: 'rgb(11, 166, 223)',
             textDecoration: 'underline'
           }}
         >
