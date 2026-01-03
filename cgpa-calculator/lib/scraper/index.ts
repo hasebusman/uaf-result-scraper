@@ -4,18 +4,18 @@ import { CONFIG } from './config';
 import type { CourseRow, ResultData } from '../../app/types';
 import https from 'https'; 
 
-// Create a custom HTTPS agent that allows insecure connections (for development only)
+
 const httpsAgent = new https.Agent({
-  rejectUnauthorized: false // WARNING: This is not secure for production
+  rejectUnauthorized: false 
 });
 
 export class UAFScraper {
   private async submitFormAndGetResult(regNumber: string): Promise<string> {
     try {
-      // Log connection attempt for debugging
+     
       console.debug(`Attempting to connect to ${CONFIG.LOGIN_URL} for registration number ${regNumber}`);
       
-      // Make sure URLs use HTTPS not HTTP
+     
       const loginUrl = CONFIG.LOGIN_URL.replace('http://', 'https://');
       const resultUrl = CONFIG.RESULT_URL.replace('http://', 'https://');
       
@@ -26,7 +26,7 @@ export class UAFScraper {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
         },
-        httpsAgent // Use the custom HTTPS agent to ignore certificate issues
+        httpsAgent
       });
 
       const cookies = loginPageResponse.headers['set-cookie'];
@@ -61,7 +61,7 @@ export class UAFScraper {
         validateStatus: null, 
         timeout: CONFIG.AXIOS_TIMEOUT,
         withCredentials: true,
-        httpsAgent // Use the custom HTTPS agent here too
+        httpsAgent
       });
 
       if (resultResponse.status !== 200) {

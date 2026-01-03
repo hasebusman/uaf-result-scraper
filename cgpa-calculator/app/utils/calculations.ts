@@ -189,50 +189,51 @@ function compareSemesters(sem1: string, sem2: string): number {
   return 0; 
 }
 
-export function groupBySemester(courses: CourseRow[]): Record<string, CourseRow[]> {
-  const sortedCourses = [...courses].sort((a, b) =>
-    compareSemesters(a.semester, b.semester)
-  );
+/**
+ * Filters courses to keep only the best attempt per course code.
+ * When a student re-enrolls in a course to improve their grade,
+ * this function keeps only the attempt with higher marks.
+ */
+export function filterBestCourseAttempts(courses: CourseRow[]): CourseRow[] {
+  const courseMap = new Map<string, CourseRow>();
 
-  const courseInfo = new Map<string, {
-    firstSemester: string;
-    bestGrade: CourseRow;
-    bestGradePoints: number;
-  }>();
-
-  sortedCourses.forEach(course => {
+  courses.forEach(course => {
     const courseCode = course.course_code;
-    const currentGradePoints = calculateGradePoints(course);
-    const existing = courseInfo.get(courseCode);
+    const currentTotal = parseFloat(course.total) || 0;
+    const existing = courseMap.get(courseCode);
 
     if (!existing) {
-      courseInfo.set(courseCode, {
-        firstSemester: course.semester,
-        bestGrade: course,
-        bestGradePoints: currentGradePoints
-      });
-    } else if (currentGradePoints > existing.bestGradePoints) {
-
-      courseInfo.set(courseCode, {
-        firstSemester: existing.firstSemester, 
-        bestGrade: {
+      courseMap.set(courseCode, course);
+    } else {
+      const existingTotal = parseFloat(existing.total) || 0;
+      if (currentTotal > existingTotal) {
+        // Keep the course with higher marks, mark as improved
+        courseMap.set(courseCode, {
           ...course,
-          semester: existing.firstSemester, 
-          teacher_name: `${course.teacher_name} (Improved)` 
-        },
-        bestGradePoints: currentGradePoints
-      });
+          teacher_name: course.teacher_name ? `${course.teacher_name} (Improved)` : '(Improved)'
+        });
+      }
     }
   });
 
+  return Array.from(courseMap.values());
+}
+
+export function groupBySemester(courses: CourseRow[]): Record<string, CourseRow[]> {
+  // First filter to keep only best attempts
+  const filteredCourses = filterBestCourseAttempts(courses);
+  
+  const sortedCourses = [...filteredCourses].sort((a, b) =>
+    compareSemesters(a.semester, b.semester)
+  );
 
   const semesterGroups: Record<string, CourseRow[]> = {};
 
-  courseInfo.forEach(({ firstSemester, bestGrade }) => {
-    if (!semesterGroups[firstSemester]) {
-      semesterGroups[firstSemester] = [];
+  sortedCourses.forEach(course => {
+    if (!semesterGroups[course.semester]) {
+      semesterGroups[course.semester] = [];
     }
-    semesterGroups[firstSemester].push(bestGrade);
+    semesterGroups[course.semester].push(course);
   });
 
   return Object.keys(semesterGroups)

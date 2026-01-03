@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { BookOpen, Trash2, ChevronDown, ChevronUp, Info, Plus } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getGradeColor } from '../../utils/gradeUtils'
 import { CourseRow } from '../../types'
-import { calculateGradePoints, cgpaToPercentage, calculateSemesterCGPA } from '../../utils/calculations'
+import { calculateGradePoints, cgpaToPercentage, calculateSemesterCGPA, groupBySemester } from '../../utils/calculations'
 import { CourseDetailModal } from '../models/CourseDetailModal'
 import { AddCourseModal } from '../models/AddCourseModal' 
 import { useResultStore } from '../../store/useResultStore';
@@ -25,8 +25,9 @@ export const SemesterCard = ({
     includedCourses
   } = useResultStore();
   
-
-  const courses = includedCourses.filter(course => course.semester === semester);
+  // Use groupBySemester which filters for best course attempts
+  const semesterGroups = useMemo(() => groupBySemester(includedCourses), [includedCourses]);
+  const courses = semesterGroups[semester] || [];
   const semesterCGPA = calculateSemesterCGPA(courses);
   const [selectedCourse, setSelectedCourse] = useState<CourseRow | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)

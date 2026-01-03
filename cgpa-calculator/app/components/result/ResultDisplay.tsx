@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion'
 import { GraduationCap, Users, TrendingUp } from 'lucide-react'
 import { SemesterCard } from './SemesterCard'
-import { groupBySemester, calculateOverallCGPA, cgpaToPercentage } from '../../utils/calculations'
-import { useEffect, useState } from 'react'
+import { groupBySemester, calculateOverallCGPA, cgpaToPercentage, filterBestCourseAttempts } from '../../utils/calculations'
+import { useEffect, useState, useMemo } from 'react'
 import { AttendanceModal } from '../models/AttendanceModal'
 import { useResultStore } from '../../store/useResultStore'
 import dynamic from 'next/dynamic'
@@ -26,7 +26,10 @@ export const ResultDisplay = ({ windowWidth }: ResultDisplayProps) => {
     setOverallCGPA(calculateOverallCGPA(includedCourses))
   }, [includedCourses])
 
-  const semesters = Object.keys(groupBySemester(includedCourses));
+  const semesterGroups = useMemo(() => groupBySemester(includedCourses), [includedCourses]);
+  const semesters = Object.keys(semesterGroups);
+  // Get the filtered course count (unique courses with best attempts only)
+  const filteredCourseCount = useMemo(() => filterBestCourseAttempts(includedCourses).length, [includedCourses]);
 
   return (
     <>
@@ -96,7 +99,7 @@ export const ResultDisplay = ({ windowWidth }: ResultDisplayProps) => {
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-green-500"></div>
                 <span className="text-sm text-stone-600">
-                  <strong className="text-stone-900">{includedCourses.length}</strong> Courses
+                  <strong className="text-stone-900">{filteredCourseCount}</strong> Courses
                 </span>
               </div>
             </div>
