@@ -170,23 +170,54 @@ function needsImprovement(grade: string): boolean {
   return grade === 'D' || grade === 'F';
 }
 
+/**
+ * Get semester type order: Winter=1, Spring=2, Summer=3
+ * Academic year starts with Winter and ends with Summer
+ */
+function getSemesterTypeOrder(semester: string): number {
+  const lower = semester?.toLowerCase() || '';
+  if (lower.includes('winter')) return 1;
+  if (lower.includes('spring')) return 2;
+  if (lower.includes('summer')) return 3;
+  return 0;
+}
+
+/**
+ * Parse academic year from semester string
+ * Handles formats like "2022-2023", "2024-25", "2025-26"
+ */
+function parseAcademicYear(semester: string): { startYear: number; endYear: number } {
+  // Match patterns like "2022-2023" or "2024-25"
+  const match = semester?.match(/(\d{4})[-/](\d{2,4})/);
+  if (match) {
+    const startYear = parseInt(match[1]);
+    let endYear = parseInt(match[2]);
+    // Handle 2-digit year format (e.g., "24-25" -> 2024-2025)
+    if (endYear < 100) {
+      endYear = Math.floor(startYear / 100) * 100 + endYear;
+    }
+    return { startYear, endYear };
+  }
+  return { startYear: 0, endYear: 0 };
+}
+
+/**
+ * Compare two semesters for sorting (chronological order: oldest first)
+ * Order within academic year: Winter -> Spring -> Summer
+ */
 function compareSemesters(sem1: string, sem2: string): number {
-  const getYearRange = (sem: string) => {
-    const match = sem?.match(/(\d{4})-(\d{4})/);
-    return match ? [parseInt(match[1]), parseInt(match[2])] : [0, 0];
-  };
+  const year1 = parseAcademicYear(sem1);
+  const year2 = parseAcademicYear(sem2);
 
-  const [year1Start, year1End] = getYearRange(sem1);
-  const [year2Start, year2End] = getYearRange(sem2);
-
-  if (year1Start !== year2Start) {
-    return year1Start - year2Start;
-  }
-  if (year1End !== year2End) {
-    return year1End - year2End;
+  // First compare by academic year start
+  if (year1.startYear !== year2.startYear) {
+    return year1.startYear - year2.startYear;
   }
 
-  return 0; 
+  // Then compare by semester type within the same year
+  const type1 = getSemesterTypeOrder(sem1);
+  const type2 = getSemesterTypeOrder(sem2);
+  return type1 - type2;
 }
 
 /**
@@ -236,10 +267,28 @@ export function groupBySemester(courses: CourseRow[]): Record<string, CourseRow[
     semesterGroups[course.semester].push(course);
   });
 
+  // Sort semesters in reverse chronological order (latest first for display)
   return Object.keys(semesterGroups)
-    .sort(compareSemesters)
+    .sort((a, b) => compareSemesters(b, a)) // Reverse order: latest first
     .reduce((acc, semester) => {
       acc[semester] = semesterGroups[semester];
       return acc;
     }, {} as Record<string, CourseRow[]>);
+}
+
+/**
+ * Get sorted semesters in chronological order (oldest first) for numbering
+ */
+export function getSortedSemestersChronological(courses: CourseRow[]): string[] {
+  const filteredCourses = filterBestCourseAttempts(courses);
+  const uniqueSemesters = [...new Set(filteredCourses.map(c => c.semester))];
+  return uniqueSemesters.sort(compareSemesters);
+}
+
+/**
+ * Get semester number (1-based) in chronological order
+ */
+export function getSemesterNumber(semester: string, allCourses: CourseRow[]): number {
+  const sortedSemesters = getSortedSemestersChronological(allCourses);
+  return sortedSemesters.indexOf(semester) + 1;
 }

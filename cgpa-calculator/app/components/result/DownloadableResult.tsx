@@ -1,5 +1,5 @@
 import { ResultData, CourseRow } from '../../types';
-import { groupBySemester, calculateSemesterCGPA, calculateOverallCGPA } from '../../utils/calculations';
+import { groupBySemester, calculateSemesterCGPA, calculateOverallCGPA, getSemesterNumber } from '../../utils/calculations';
 
 interface DownloadableResultProps {
   result: ResultData;
@@ -57,7 +57,9 @@ export const DownloadableResult = ({ result, includedCourses }: DownloadableResu
       </div>
 
       <div style={{ flex: 1 }}>
-        {Object.entries(groupedCourses).map(([semester, courses]) => (
+        {Object.entries(groupedCourses).map(([semester, courses]) => {
+          const semesterNum = getSemesterNumber(semester, includedCourses);
+          return (
           <div key={semester} style={{ marginBottom: '2rem', pageBreakInside: 'avoid' }}>
             <div style={{ 
               display: 'flex', 
@@ -67,7 +69,9 @@ export const DownloadableResult = ({ result, includedCourses }: DownloadableResu
               paddingBottom: '0.5rem',
               marginBottom: '1rem'
             }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#000' }}>{semester}</h3>
+              <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#000' }}>
+                {semester} <span style={{ fontSize: '14px', color: '#666' }}>(Sem {semesterNum})</span>
+              </h3>
               <p style={{ fontSize: '16px', fontWeight: 'bold', color: '#000' }}>
                 Semester GPA: {calculateSemesterCGPA(courses).toFixed(4)}
               </p>
@@ -108,7 +112,8 @@ export const DownloadableResult = ({ result, includedCourses }: DownloadableResu
               </tbody>
             </table>
           </div>
-        ))}
+        );
+        })}  
       </div>
       <div style={{
         borderTop: '1px solid #000',

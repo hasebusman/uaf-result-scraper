@@ -1,7 +1,7 @@
 'use client';
 
 import { ResultData, CourseRow } from '../types';
-import { calculateOverallCGPA, calculateSemesterCGPA, groupBySemester, cgpaToPercentage } from './calculations';
+import { calculateOverallCGPA, calculateSemesterCGPA, groupBySemester, cgpaToPercentage, getSemesterNumber } from './calculations';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -49,12 +49,15 @@ export class PDFDownloadHelper {
     
     // Add semester tables
     Object.entries(groupedSemesters).forEach(([semester, courses]) => {
+      // Get semester number
+      const semesterNum = getSemesterNumber(semester, includedCourses);
+      
       // Add semester header
       doc.setFillColor(30, 58, 138); // blue-900
       doc.setTextColor(255, 255, 255); // white
       doc.rect(14, yPosition, 182, 8, 'F');
       doc.setFontSize(11);
-      doc.text(semester, 20, yPosition + 5.5);
+      doc.text(`${semester} (Sem ${semesterNum})`, 20, yPosition + 5.5);
       
       yPosition += 12;
       

@@ -3,7 +3,7 @@ import { BookOpen, Trash2, ChevronDown, ChevronUp, Info, Plus } from 'lucide-rea
 import { motion, AnimatePresence } from 'framer-motion'
 import { getGradeColor } from '../../utils/gradeUtils'
 import { CourseRow } from '../../types'
-import { calculateGradePoints, cgpaToPercentage, calculateSemesterCGPA, groupBySemester } from '../../utils/calculations'
+import { calculateGradePoints, cgpaToPercentage, calculateSemesterCGPA, groupBySemester, getSemesterNumber } from '../../utils/calculations'
 import { CourseDetailModal } from '../models/CourseDetailModal'
 import { AddCourseModal } from '../models/AddCourseModal' 
 import { useResultStore } from '../../store/useResultStore';
@@ -29,6 +29,7 @@ export const SemesterCard = ({
   const semesterGroups = useMemo(() => groupBySemester(includedCourses), [includedCourses]);
   const courses = semesterGroups[semester] || [];
   const semesterCGPA = calculateSemesterCGPA(courses);
+  const semesterNumber = useMemo(() => getSemesterNumber(semester, includedCourses), [semester, includedCourses]);
   const [selectedCourse, setSelectedCourse] = useState<CourseRow | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const isExpanded = expandedSemesters.includes(semester);
@@ -101,9 +102,14 @@ export const SemesterCard = ({
               <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-primary-600" />
               </div>
-              <h2 className="text-lg font-bold text-stone-900">
-                {semester}
-              </h2>
+              <div>
+                <h2 className="text-lg font-bold text-stone-900">
+                  {semester}
+                </h2>
+                <span className="text-xs font-medium text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full">
+                  Sem {semesterNumber}
+                </span>
+              </div>
             </div>
             
             <div className="flex items-center gap-4">
